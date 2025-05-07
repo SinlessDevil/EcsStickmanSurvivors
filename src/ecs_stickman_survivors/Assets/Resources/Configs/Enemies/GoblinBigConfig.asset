@@ -1,0 +1,46 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2afc7190ee7a4b10bd7f1bb770e65bfd, type: 3}
+  m_Name: GoblinBigConfig
+  m_EditorClassIdentifier: 
+  EnemyTypeId: 4
+  Levels:
+  - Hp: 8
+    Speed: 1
+    RadiusToCollectTargets: 0.3
+    CollectTargetsInterval: 0.5
+    EffectSetups:
+    - EffectTypeId: 1
+      Value: 3
+    StatusSetups: []
+    RadiusToFindEnemy: 3
+    CreateEffectInterval: 3
+  - Hp: 12
+    Speed: 2
+    RadiusToCollectTargets: 0.3
+    CollectTargetsInterval: 0.5
+    EffectSetups:
+    - EffectTypeId: 1
+      Value: 5
+    StatusSetups: []
+    RadiusToFindEnemy: 3
+    CreateEffectInterval: 3
+  - Hp: 15
+    Speed: 2
+    RadiusToCollectTargets: 0.3
+    CollectTargetsInterval: 0.5
+    EffectSetups:
+    - EffectTypeId: 1
+      Value: 10
+    StatusSetups: []
+    RadiusToFindEnemy: 3
+    CreateEffectInterval: 3

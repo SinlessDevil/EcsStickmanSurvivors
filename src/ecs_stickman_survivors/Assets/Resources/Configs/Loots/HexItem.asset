@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8d9b35b8f09a43c19fe723fae8994a1d, type: 3}
+  m_Name: HexItem
+  m_EditorClassIdentifier: 
+  LootTypeId: 7
+  Experience: 0
+  Prefab: {fileID: 4923662872471673908, guid: e8328ff5599388947b598ae2d598de75, type: 3}
+  EffectSetups: []
+  StatusSetups:
+  - StatusTypeId: 22
+    Value: -0.75
+    Duration: 15
+    Period: 0
+    StatusApplicationTypeId: 0
+    StatusTriggerConditionTypeId: 0
+    IsStackable: 1

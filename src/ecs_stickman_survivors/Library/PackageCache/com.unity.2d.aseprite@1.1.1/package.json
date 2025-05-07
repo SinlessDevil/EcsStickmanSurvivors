@@ -1,0 +1,37 @@
+{
+  "name": "com.unity.2d.aseprite",
+  "version": "1.1.1",
+  "unity": "2021.3",
+  "unityRelease": "15f1",
+  "displayName": "2D Aseprite Importer",
+  "description": "2D Aseprite Importer is a package which enables the import of .aseprite files from the Pixel Art tool Aseprite.",
+  "keywords": [
+    "2d",
+    "Aseprite",
+    "Pixel",
+    "Art",
+    "assetimporter"
+  ],
+  "category": "2D",
+  "dependencies": {
+    "com.unity.2d.sprite": "1.0.0",
+    "com.unity.2d.common": "6.0.6",
+    "com.unity.mathematics": "1.2.6",
+    "com.unity.modules.animation": "1.0.0"
+  },
+  "relatedPackages": {
+    "com.unity.2d.aseprite.tests": "1.1.1"
+  },
+  "_upm": {
+    "changelog": "### Fixed\n- Fixed an issue where the Sprite Editor could be opened even though there were no valid texture to open it with.\n- Fixed an issue where the importer would not generate a square power of two texture for compressions which needs it (pvrtc).\n- Fixed an issue where changes to linked cells would not be taken into account when reimporting."
+  },
+  "upmCi": {
+    "footprint": "5fc56abd22b7390d24fa554986c2cca858e86214"
+  },
+  "documentationUrl": "https://docs.unity3d.com/Packages/com.unity.2d.aseprite@1.1/manual/index.html",
+  "repository": {
+    "url": "https://github.cds.internal.unity3d.com/unity/AsepriteImporter.git",
+    "type": "git",
+    "revision": "4c5ce5be19fca25f82112eb80561965bc91c72c2"
+  }
+}

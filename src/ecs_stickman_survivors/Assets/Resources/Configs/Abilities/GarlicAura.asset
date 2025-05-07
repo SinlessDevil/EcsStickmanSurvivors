@@ -1,0 +1,94 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be200600f51647d0953ea7d87c62b4e2, type: 3}
+  m_Name: GarlicAura
+  m_EditorClassIdentifier: 
+  AbilityId: 20
+  Levels:
+  - Cooldown: 0
+    ViewPrefab: {fileID: 8615003941349736562, guid: c4c8cf39ebe3672468c50bd2fedcd936, type: 3}
+    EffectSetups: []
+    StatusSetups:
+    - StatusTypeId: 2
+      Value: -5
+      Duration: 0.2
+      Period: 0
+      StatusApplicationTypeId: 2
+      StatusTriggerConditionTypeId: 1
+      IsStackable: 1
+    ProjectileSetup:
+      Speed: 0
+      Pierce: 0
+      ContactRadius: 0
+      LifeTime: 0
+      ProjectileCount: 0
+      SpreadAngle: 0
+      MaxBounces: 0
+      ScaleFactor: 0
+      OrbitRadius: 0
+    AuraSetup:
+      Radius: 2
+      Interval: 0.5
+    Icon: {fileID: -223606606648191544, guid: 842c243f6485a7e4cbb13b80dbc50512, type: 3}
+    Description: Ability Garlic Aura Level 1
+  - Cooldown: 0
+    ViewPrefab: {fileID: 8615003941349736562, guid: c4c8cf39ebe3672468c50bd2fedcd936, type: 3}
+    EffectSetups: []
+    StatusSetups:
+    - StatusTypeId: 2
+      Value: -5
+      Duration: 0.2
+      Period: 0
+      StatusApplicationTypeId: 2
+      StatusTriggerConditionTypeId: 1
+      IsStackable: 1
+    ProjectileSetup:
+      Speed: 0
+      Pierce: 0
+      ContactRadius: 0
+      LifeTime: 0
+      ProjectileCount: 0
+      SpreadAngle: 0
+      MaxBounces: 0
+      ScaleFactor: 0
+      OrbitRadius: 0
+    AuraSetup:
+      Radius: 4
+      Interval: 0.5
+    Icon: {fileID: -223606606648191544, guid: 842c243f6485a7e4cbb13b80dbc50512, type: 3}
+    Description: Ability Garlic Aura Level 2
+  - Cooldown: 0
+    ViewPrefab: {fileID: 8615003941349736562, guid: c4c8cf39ebe3672468c50bd2fedcd936, type: 3}
+    EffectSetups: []
+    StatusSetups:
+    - StatusTypeId: 2
+      Value: -5
+      Duration: 0.2
+      Period: 0
+      StatusApplicationTypeId: 2
+      StatusTriggerConditionTypeId: 1
+      IsStackable: 1
+    ProjectileSetup:
+      Speed: 0
+      Pierce: 0
+      ContactRadius: 0
+      LifeTime: 0
+      ProjectileCount: 0
+      SpreadAngle: 0
+      MaxBounces: 0
+      ScaleFactor: 0
+      OrbitRadius: 0
+    AuraSetup:
+      Radius: 6
+      Interval: 0.5
+    Icon: {fileID: -223606606648191544, guid: 842c243f6485a7e4cbb13b80dbc50512, type: 3}
+    Description: Ability Garlic Aura Level 3

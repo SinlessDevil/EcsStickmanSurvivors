@@ -1,0 +1,7 @@
+.unity-tilepalette-brushinspectorpopup
+{
+    border-left-color: rgb(130, 130, 130);
+    border-right-color: rgb(130, 130, 130);
+    border-top-color: rgb(130, 130, 130);
+    border-bottom-color: rgb(130, 130, 130);
+}

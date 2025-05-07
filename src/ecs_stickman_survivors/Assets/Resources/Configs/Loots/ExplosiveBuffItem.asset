@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8d9b35b8f09a43c19fe723fae8994a1d, type: 3}
+  m_Name: ExplosiveBuffItem
+  m_EditorClassIdentifier: 
+  LootTypeId: 4
+  Experience: 0
+  Prefab: {fileID: 4923662872471673908, guid: fd833710d5f9f694386686625ef93282, type: 3}
+  EffectSetups:
+  - EffectTypeId: 2
+    Value: 2
+  StatusSetups:
+  - StatusTypeId: 21
+    Value: 0
+    Duration: 10
+    Period: 0
+    StatusApplicationTypeId: 0
+    StatusTriggerConditionTypeId: 0
+    IsStackable: 1

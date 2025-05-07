@@ -1,0 +1,100 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be200600f51647d0953ea7d87c62b4e2, type: 3}
+  m_Name: ScatteringRunStoneBolt
+  m_EditorClassIdentifier: 
+  AbilityId: 4
+  Levels:
+  - Cooldown: 1
+    ViewPrefab: {fileID: 1254211284008102895, guid: 0848acc8b0f10904e864214234d084a7, type: 3}
+    EffectSetups:
+    - EffectTypeId: 1
+      Value: 1
+    StatusSetups:
+    - StatusTypeId: 3
+      Value: 6
+      Duration: 3
+      Period: 0
+      StatusApplicationTypeId: 2
+      StatusTriggerConditionTypeId: 2
+      IsStackable: 1
+    ProjectileSetup:
+      Speed: 6
+      Pierce: 3
+      ContactRadius: 0.1
+      LifeTime: 3
+      ProjectileCount: 3
+      SpreadAngle: 360
+      MaxBounces: 0
+      ScaleFactor: 0.5
+      OrbitRadius: 0
+    AuraSetup:
+      Radius: 0
+      Interval: 0
+    Icon: {fileID: 21300000, guid: b9a847102a75c8c429a8f749008df6c2, type: 3}
+    Description: Ability Scattering Rune Stone Level 1
+  - Cooldown: 1
+    ViewPrefab: {fileID: 1254211284008102895, guid: 0848acc8b0f10904e864214234d084a7, type: 3}
+    EffectSetups:
+    - EffectTypeId: 1
+      Value: 1
+    StatusSetups:
+    - StatusTypeId: 3
+      Value: 6
+      Duration: 3
+      Period: 0
+      StatusApplicationTypeId: 2
+      StatusTriggerConditionTypeId: 2
+      IsStackable: 1
+    ProjectileSetup:
+      Speed: 6
+      Pierce: 3
+      ContactRadius: 0.1
+      LifeTime: 3
+      ProjectileCount: 5
+      SpreadAngle: 360
+      MaxBounces: 0
+      ScaleFactor: 0.5
+      OrbitRadius: 0
+    AuraSetup:
+      Radius: 0
+      Interval: 0
+    Icon: {fileID: 21300000, guid: b9a847102a75c8c429a8f749008df6c2, type: 3}
+    Description: Ability Scattering Rune Stone Level 2
+  - Cooldown: 1
+    ViewPrefab: {fileID: 1254211284008102895, guid: 0848acc8b0f10904e864214234d084a7, type: 3}
+    EffectSetups:
+    - EffectTypeId: 1
+      Value: 1
+    StatusSetups:
+    - StatusTypeId: 3
+      Value: 6
+      Duration: 3
+      Period: 0
+      StatusApplicationTypeId: 2
+      StatusTriggerConditionTypeId: 2
+      IsStackable: 1
+    ProjectileSetup:
+      Speed: 6
+      Pierce: 3
+      ContactRadius: 0.1
+      LifeTime: 3
+      ProjectileCount: 7
+      SpreadAngle: 360
+      MaxBounces: 0
+      ScaleFactor: 0.5
+      OrbitRadius: 0
+    AuraSetup:
+      Radius: 0
+      Interval: 0
+    Icon: {fileID: 21300000, guid: b9a847102a75c8c429a8f749008df6c2, type: 3}
+    Description: Ability Scattering Rune Stone Level 3

@@ -1,0 +1,79 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be200600f51647d0953ea7d87c62b4e2, type: 3}
+  m_Name: VegetableBolt
+  m_EditorClassIdentifier: 
+  AbilityId: 1
+  Levels:
+  - Cooldown: 1
+    ViewPrefab: {fileID: 1254211284008102895, guid: 08ce9f5922001044d87f0b92a159a8c4, type: 3}
+    EffectSetups:
+    - EffectTypeId: 1
+      Value: 1
+    StatusSetups: []
+    ProjectileSetup:
+      Speed: 2
+      Pierce: 3
+      ContactRadius: 0.1
+      LifeTime: 3
+      ProjectileCount: 0
+      SpreadAngle: 0
+      MaxBounces: 0
+      ScaleFactor: 0
+      OrbitRadius: 0
+    AuraSetup:
+      Radius: 0
+      Interval: 0
+    Icon: {fileID: -219949570, guid: d5b38a44d661b59469b9795112af70db, type: 3}
+    Description: Ability Vegetable Bolt Level 1
+  - Cooldown: 1
+    ViewPrefab: {fileID: 1254211284008102895, guid: 08ce9f5922001044d87f0b92a159a8c4, type: 3}
+    EffectSetups:
+    - EffectTypeId: 1
+      Value: 1
+    StatusSetups: []
+    ProjectileSetup:
+      Speed: 3
+      Pierce: 3
+      ContactRadius: 0.1
+      LifeTime: 3
+      ProjectileCount: 0
+      SpreadAngle: 0
+      MaxBounces: 0
+      ScaleFactor: 0
+      OrbitRadius: 0
+    AuraSetup:
+      Radius: 0
+      Interval: 0
+    Icon: {fileID: -219949570, guid: d5b38a44d661b59469b9795112af70db, type: 3}
+    Description: Ability Vegetable Bolt Level 2
+  - Cooldown: 0.5
+    ViewPrefab: {fileID: 1254211284008102895, guid: 08ce9f5922001044d87f0b92a159a8c4, type: 3}
+    EffectSetups:
+    - EffectTypeId: 1
+      Value: 1
+    StatusSetups: []
+    ProjectileSetup:
+      Speed: 4
+      Pierce: 6
+      ContactRadius: 0.1
+      LifeTime: 3
+      ProjectileCount: 0
+      SpreadAngle: 0
+      MaxBounces: 0
+      ScaleFactor: 0
+      OrbitRadius: 0
+    AuraSetup:
+      Radius: 0
+      Interval: 0
+    Icon: {fileID: -219949570, guid: d5b38a44d661b59469b9795112af70db, type: 3}
+    Description: Ability Vegetable Bolt Level 3

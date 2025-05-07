@@ -1,0 +1,100 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be200600f51647d0953ea7d87c62b4e2, type: 3}
+  m_Name: OrbitingMushroomBolt
+  m_EditorClassIdentifier: 
+  AbilityId: 5
+  Levels:
+  - Cooldown: 4
+    ViewPrefab: {fileID: 305485127122427316, guid: 92dc63e318e181a4a9587ecf7216ee46, type: 3}
+    EffectSetups:
+    - EffectTypeId: 1
+      Value: 1
+    StatusSetups:
+    - StatusTypeId: 1
+      Value: 1
+      Duration: 3
+      Period: 1
+      StatusApplicationTypeId: 2
+      StatusTriggerConditionTypeId: 1
+      IsStackable: 1
+    ProjectileSetup:
+      Speed: 2
+      Pierce: 0
+      ContactRadius: 0.1
+      LifeTime: 3
+      ProjectileCount: 2
+      SpreadAngle: 0
+      MaxBounces: 0
+      ScaleFactor: 0
+      OrbitRadius: 1
+    AuraSetup:
+      Radius: 0
+      Interval: 0
+    Icon: {fileID: 21300000, guid: 4d94380f2cdab534b96b00f84934873a, type: 3}
+    Description: Ability Orbiting Mushroom Level 1
+  - Cooldown: 3
+    ViewPrefab: {fileID: 305485127122427316, guid: 92dc63e318e181a4a9587ecf7216ee46, type: 3}
+    EffectSetups:
+    - EffectTypeId: 1
+      Value: 1
+    StatusSetups:
+    - StatusTypeId: 1
+      Value: 1
+      Duration: 3
+      Period: 1
+      StatusApplicationTypeId: 2
+      StatusTriggerConditionTypeId: 1
+      IsStackable: 1
+    ProjectileSetup:
+      Speed: 2
+      Pierce: 0
+      ContactRadius: 0.1
+      LifeTime: 3
+      ProjectileCount: 3
+      SpreadAngle: 0
+      MaxBounces: 0
+      ScaleFactor: 0
+      OrbitRadius: 1.5
+    AuraSetup:
+      Radius: 0
+      Interval: 0
+    Icon: {fileID: 21300000, guid: 4d94380f2cdab534b96b00f84934873a, type: 3}
+    Description: Ability Orbiting Mushroom Level 2
+  - Cooldown: 2
+    ViewPrefab: {fileID: 305485127122427316, guid: 92dc63e318e181a4a9587ecf7216ee46, type: 3}
+    EffectSetups:
+    - EffectTypeId: 1
+      Value: 1
+    StatusSetups:
+    - StatusTypeId: 1
+      Value: 1
+      Duration: 3
+      Period: 1
+      StatusApplicationTypeId: 2
+      StatusTriggerConditionTypeId: 1
+      IsStackable: 1
+    ProjectileSetup:
+      Speed: 2
+      Pierce: 0
+      ContactRadius: 0.1
+      LifeTime: 3
+      ProjectileCount: 4
+      SpreadAngle: 0
+      MaxBounces: 0
+      ScaleFactor: 0
+      OrbitRadius: 2
+    AuraSetup:
+      Radius: 0
+      Interval: 0
+    Icon: {fileID: 21300000, guid: 4d94380f2cdab534b96b00f84934873a, type: 3}
+    Description: Ability Orbiting Mushroom Level 3

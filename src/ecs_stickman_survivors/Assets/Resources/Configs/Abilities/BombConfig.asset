@@ -1,0 +1,79 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be200600f51647d0953ea7d87c62b4e2, type: 3}
+  m_Name: BombConfig
+  m_EditorClassIdentifier: 
+  AbilityId: 6
+  Levels:
+  - Cooldown: 2
+    ViewPrefab: {fileID: 2582926185123623001, guid: 2959c971c8df16742980bcf25acb13b7, type: 3}
+    EffectSetups:
+    - EffectTypeId: 1
+      Value: 0.2
+    StatusSetups: []
+    ProjectileSetup:
+      Speed: 2
+      Pierce: 0
+      ContactRadius: 0
+      LifeTime: 5
+      ProjectileCount: 0
+      SpreadAngle: 0
+      MaxBounces: 0
+      ScaleFactor: 0
+      OrbitRadius: 0
+    AuraSetup:
+      Radius: 1
+      Interval: 0.5
+    Icon: {fileID: 21300000, guid: bead47d786e844adba7899d02e8851eb, type: 3}
+    Description: Ability Bomb Bolt Level 1
+  - Cooldown: 1.5
+    ViewPrefab: {fileID: 2582926185123623001, guid: 2959c971c8df16742980bcf25acb13b7, type: 3}
+    EffectSetups:
+    - EffectTypeId: 1
+      Value: 0.3
+    StatusSetups: []
+    ProjectileSetup:
+      Speed: 2
+      Pierce: 0
+      ContactRadius: 2
+      LifeTime: 8
+      ProjectileCount: 0
+      SpreadAngle: 0
+      MaxBounces: 0
+      ScaleFactor: 0
+      OrbitRadius: 0
+    AuraSetup:
+      Radius: 2
+      Interval: 0.3
+    Icon: {fileID: 21300000, guid: bead47d786e844adba7899d02e8851eb, type: 3}
+    Description: Ability Bomb Bolt Level 2
+  - Cooldown: 1
+    ViewPrefab: {fileID: 2582926185123623001, guid: 2959c971c8df16742980bcf25acb13b7, type: 3}
+    EffectSetups:
+    - EffectTypeId: 1
+      Value: 0.4
+    StatusSetups: []
+    ProjectileSetup:
+      Speed: 2
+      Pierce: 0
+      ContactRadius: 3
+      LifeTime: 7
+      ProjectileCount: 0
+      SpreadAngle: 0
+      MaxBounces: 0
+      ScaleFactor: 0
+      OrbitRadius: 0
+    AuraSetup:
+      Radius: 3
+      Interval: 0.15
+    Icon: {fileID: 21300000, guid: bead47d786e844adba7899d02e8851eb, type: 3}
+    Description: Ability Bomb Bolt Level 3
