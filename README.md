@@ -1,1 +1,1 @@
-Ecs Stick Survivors
+Ecs Stickman Survivors
