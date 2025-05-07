@@ -1,2 +1,1 @@
-# EcsStickSurvivors
 Ecs Stick Survivors
