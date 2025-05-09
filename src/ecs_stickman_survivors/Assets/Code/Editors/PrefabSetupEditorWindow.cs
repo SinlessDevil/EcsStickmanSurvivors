@@ -23,6 +23,7 @@ namespace Code.Editors
         
         [BoxGroup("Set Material To Children")] 
         [LabelText("Target Material")]
+        [SerializeField]
         private Material _targetMaterial;
 
         [BoxGroup("Set Material To Children")] 
@@ -84,6 +85,7 @@ namespace Code.Editors
         
         [BoxGroup("Set Random Material for Matching Mesh")]
         [LabelText("Possible Materials")]
+        [SerializeField]
         public Material[] _materialsToApply;
         
         [BoxGroup("Set Random Material for Matching Mesh")]
