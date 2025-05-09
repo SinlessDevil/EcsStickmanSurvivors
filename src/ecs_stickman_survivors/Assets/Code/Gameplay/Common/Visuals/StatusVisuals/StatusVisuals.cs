@@ -8,121 +8,159 @@ namespace Code.Gameplay.Common.Visuals.StatusVisuals
 {
     public class StatusVisuals : MonoBehaviour, IStatusVisuals
     {
-        private static readonly int ColorProperty = Shader.PropertyToID("_Color");
-        private static readonly int ColorIntensityProperty = Shader.PropertyToID("_Intensity");
-        private static readonly int OutlineSizeProperty = Shader.PropertyToID("_OutlineSize");
-        private static readonly int OutlineColorProperty = Shader.PropertyToID("_OutlineColor");
-        private static readonly int OutlineSmoothnessProperty = Shader.PropertyToID("_OutlineSmoothness");
+        private static readonly int OutlineColorID = Shader.PropertyToID("_OutlineColor");
+        private static readonly int OutlineWidthID = Shader.PropertyToID("_OutlineWidth");
+        private static readonly int RimColorID = Shader.PropertyToID("_RimColor");
+        private static readonly int RimStepID = Shader.PropertyToID("_RimStep");
+        private static readonly int RimStepSmoothID = Shader.PropertyToID("_RimStepSmooth");
 
-        public SpriteRenderer Renderer;
+        public SkinnedMeshRenderer Renderer;
         public Animator Animator;
         public Transform ParentVisual;
 
         public StatusEffect FreezeEffect = new()
         {
-            Color = new StatusEffectColor(new Color32(56, 163, 190, 255), 1f),
-            OutlineSize = 3,
-            OutlineSmoothness = 8,
+            OutlineColor = new Color32(56, 163, 190, 255),
+            OutlineWidth = 0.35f,
+            RimColor = Color.cyan,
+            RimStep = 0.7f,
+            RimStepSmooth = 0.3f,
             AffectsAnimator = true,
             AnimatorSpeed = 0
         };
 
-        public StatusEffectColor PoisonEffect = new(new Color32(0, 255, 0, 255), 0.6f);
-        public StatusEffectColor SpeedEffect = new(new Color32(255, 255, 0, 255), 0.6f);
-        public StatusEffectColor MaxHpEffect = new(new Color32(255, 0, 0, 255), 0.6f);
+        public StatusEffect SpeedEffect = new()
+        {
+            OutlineColor = new Color32(255, 255, 0, 255),
+            OutlineWidth = 0.35f,
+            RimColor = Color.yellow,
+            RimStep = 0.65f,
+            RimStepSmooth = 0.25f,
+            AffectsAnimator = false
+        };
 
         public StatusEffect InvulnerabilityEffect = new()
         {
-            Color = new StatusEffectColor(new Color32(255, 255, 255, 255), 1f),
-            OutlineSize = 3,
-            OutlineSmoothness = 8,
+            OutlineColor = Color.white,
+            OutlineWidth = 0.35f,
+            RimColor = Color.white,
+            RimStep = 0.8f,
+            RimStepSmooth = 0.35f,
             AffectsAnimator = true,
             AnimatorSpeed = 0
         };
 
+        public StatusEffect PoisonEffect = new()
+        {
+            OutlineColor = new Color32(0, 255, 0, 255),
+            OutlineWidth = 0.35f,
+            RimColor = new Color32(0, 200, 0, 255),
+            RimStep = 0.6f,
+            RimStepSmooth = 0.2f,
+            AffectsAnimator = false
+        };
+        
+        public StatusEffect MaxHpEffect = new()
+        {
+            OutlineColor = new Color32(255, 0, 0, 255),
+            OutlineWidth = 0.4f,
+            RimColor = new Color32(255, 80, 80, 255),
+            RimStep = 0.75f,
+            RimStepSmooth = 0.3f,
+            AffectsAnimator = false
+        };
+        
+        private Material _material;
         private Sheep _sheep;
         private IVisualFactory _visualFactory;
-        
+
         [Inject]
         private void Construct(IVisualFactory visualFactory)
         {
             _visualFactory = visualFactory;
         }
+
+        private void Awake()
+        {
+            SetUpMaterial();
+        }
+
+        private void SetUpMaterial()
+        {
+            _material = Renderer.materials[1];
+        }
         
         private void ApplyEffect(StatusEffect effect)
         {
-            Renderer.material.SetColor(OutlineColorProperty, effect.Color.Color);
-            Renderer.material.SetFloat(OutlineSizeProperty, effect.OutlineSize);
-            Renderer.material.SetFloat(OutlineSmoothnessProperty, effect.OutlineSmoothness);
+            if(_material == null)
+                SetUpMaterial();
+            
+            _material.SetColor(OutlineColorID, effect.OutlineColor);
+            _material.SetFloat(OutlineWidthID, effect.OutlineWidth);
+            _material.SetColor(RimColorID, effect.RimColor);
+            _material.SetFloat(RimStepID, effect.RimStep);
+            _material.SetFloat(RimStepSmoothID, effect.RimStepSmooth);
 
             if (effect.AffectsAnimator)
-            {
                 Animator.speed = effect.AnimatorSpeed;
-            }
-        }
-
-        private void ApplyEffect(StatusEffectColor effectColor)
-        {
-            Renderer.material.SetColor(ColorProperty, effectColor.Color);
-            Renderer.material.SetFloat(ColorIntensityProperty, effectColor.Intensity);
         }
 
         private void UnapplyEffect()
         {
-            Renderer.material.SetColor(OutlineColorProperty, Color.white);
-            Renderer.material.SetFloat(OutlineSizeProperty, 0f);
-            Renderer.material.SetFloat(OutlineSmoothnessProperty, 0f);
-            Renderer.material.SetFloat(ColorIntensityProperty, 0f);
-            Animator.speed = 1;
+            if(_material == null)
+                SetUpMaterial();
+            
+            _material.SetFloat(OutlineWidthID, 0f);
+            _material.SetColor(OutlineColorID, Color.black);
+            _material.SetColor(RimColorID, Color.black);
+            _material.SetFloat(RimStepID, 0.672f);
+            _material.SetFloat(RimStepSmoothID, 0.29f);
+            
+            Animator.speed = 1f;
         }
 
         public void ApplyFreeze() => ApplyEffect(FreezeEffect);
         public void UnapplyFreeze() => UnapplyEffect();
-
+        
         public void ApplyPoison() => ApplyEffect(PoisonEffect);
+
         public void UnapplyPoison() => UnapplyEffect();
 
         public void ApplySpeedUp() => ApplyEffect(SpeedEffect);
-
         public void UnapplySpeedUp() => UnapplyEffect();
+
+        public void ApplyInvulnerability() => ApplyEffect(InvulnerabilityEffect);
+        public void UnapplyInvulnerability() => UnapplyEffect();
 
         public void ApplyMaxHp()
         {
             ApplyEffect(MaxHpEffect);
-
-            transform.parent.DOScale(1.5f, 0.5f)
-                .SetEase(Ease.Linear);
+            ParentVisual.DOScale(1.5f, 0.5f).SetEase(Ease.Linear);
         }
 
         public void UnapplyMaxHp()
         {
             UnapplyEffect();
-            
-            transform.parent.DOScale(1f, 0.5f)
-                .SetEase(Ease.Linear);
+            ParentVisual.DOScale(1f, 0.5f).SetEase(Ease.Linear);
         }
-
-        public void ApplyInvulnerability() => ApplyEffect(InvulnerabilityEffect);
-        public void UnapplyInvulnerability() => UnapplyEffect();
 
         public void ApplyHex()
         {
-            if(_sheep != null)
+            if (_sheep != null) 
                 return;
             
-            var sheep = _visualFactory.CreateSheep(Vector3.zero, ParentVisual);
-            _sheep = sheep;
-            
+            _sheep = _visualFactory.CreateSheep(Vector3.zero, ParentVisual);
             _sheep.PlayBouncing();
-            
             Renderer.enabled = false;
         }
 
         public void UnapplyHex()
         {
+            if (_sheep == null) 
+                return;
+            
             Destroy(_sheep.gameObject);
             _sheep = null;
-            
             Renderer.enabled = true;
         }
     }

@@ -3,25 +3,14 @@ using UnityEngine;
 namespace Code.Gameplay.Common.Visuals.StatusVisuals
 {
     [System.Serializable]
-    public struct StatusEffect
+    public class StatusEffect
     {
-        public StatusEffectColor Color;
-        public float OutlineSize;
-        public float OutlineSmoothness;
-        public bool AffectsAnimator;
-        public float AnimatorSpeed;
-    }
-    
-    [System.Serializable]
-    public struct StatusEffectColor
-    {
-        public Color Color;
-        public float Intensity;
-
-        public StatusEffectColor(Color color, float intensity)
-        {
-            Color = color;
-            Intensity = intensity;
-        }
+        public Color OutlineColor = Color.black;
+        public float OutlineWidth = 0f;
+        public Color RimColor = Color.black;
+        public float RimStep = 0.5f;
+        public float RimStepSmooth = 0.2f;
+        public bool AffectsAnimator = false;
+        public float AnimatorSpeed = 1f;
     }
 }

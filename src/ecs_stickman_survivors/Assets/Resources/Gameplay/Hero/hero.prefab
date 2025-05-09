@@ -856,8 +856,8 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 1f21b865f26a10b4ab18f3006114c78b, type: 2}
-  - {fileID: 2100000, guid: b2854c97b8cc8b34abf3a2e30e346a33, type: 2}
+  - {fileID: 0}
+  - {fileID: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1153,33 +1153,48 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8c6a058f969f4b8983bdbd749a304a60, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Renderer: {fileID: 2144268021912294448}
+  Renderer: {fileID: 6023236714047828199}
   Animator: {fileID: 4579866735478409500}
-  ParentVisual: {fileID: 0}
+  ParentVisual: {fileID: 6270618457600134159}
   FreezeEffect:
-    Color:
-      Color: {r: 0.21960784, g: 0.6392157, b: 0.74509805, a: 1}
-      Intensity: 0.1
-    OutlineSize: 0.42
-    OutlineSmoothness: 2.2
+    OutlineColor: {r: 0.21960784, g: 0.6392157, b: 0.74509805, a: 1}
+    OutlineWidth: 0.35
+    RimColor: {r: 0, g: 1, b: 1, a: 1}
+    RimStep: 1
+    RimStepSmooth: 1
     AffectsAnimator: 1
     AnimatorSpeed: 0
-  PoisonEffect:
-    Color: {r: 0, g: 1, b: 0.08237815, a: 1}
-    Intensity: 0.1
   SpeedEffect:
-    Color: {r: 1, g: 1, b: 0, a: 1}
-    Intensity: 0.1
-  MaxHpEffect:
-    Color: {r: 1, g: 0, b: 0.3057165, a: 1}
-    Intensity: 0.2
+    OutlineColor: {r: 1, g: 1, b: 0, a: 1}
+    OutlineWidth: 0.35
+    RimColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+    RimStep: 1
+    RimStepSmooth: 1
+    AffectsAnimator: 0
+    AnimatorSpeed: 1
   InvulnerabilityEffect:
-    Color:
-      Color: {r: 0.7008996, g: 0, b: 1, a: 1}
-      Intensity: 0
-    OutlineSize: 0.75
-    OutlineSmoothness: 2
+    OutlineColor: {r: 0.40771866, g: 0, b: 1, a: 1}
+    OutlineWidth: 0.35
+    RimColor: {r: 0.4845996, g: 0, b: 1, a: 1}
+    RimStep: 1
+    RimStepSmooth: 1
     AffectsAnimator: 1
+    AnimatorSpeed: 1
+  PoisonEffect:
+    OutlineColor: {r: 0, g: 1, b: 0, a: 1}
+    OutlineWidth: 0.35
+    RimColor: {r: 0, g: 0.78431374, b: 0, a: 1}
+    RimStep: 1
+    RimStepSmooth: 1
+    AffectsAnimator: 0
+    AnimatorSpeed: 1
+  MaxHpEffect:
+    OutlineColor: {r: 1, g: 0, b: 0, a: 1}
+    OutlineWidth: 0.4
+    RimColor: {r: 1, g: 0.3137255, b: 0.3137255, a: 1}
+    RimStep: 1
+    RimStepSmooth: 1
+    AffectsAnimator: 0
     AnimatorSpeed: 1
 --- !u!1 &6836853217784414865
 GameObject:
