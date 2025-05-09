@@ -3,26 +3,27 @@ using Sirenix.OdinInspector;
 using Sirenix.OdinInspector.Editor;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.Serialization;
 
 namespace Code.Editors
 {
-    public class MaterialSetupEditorWindow : OdinEditorWindow
+    public class PrefabSetupEditorWindow : OdinEditorWindow
     {
-        [MenuItem("Tools/Material Setup Tool")]
+        [MenuItem("Tools/Prefab Batch Editor")]
         private static void OpenWindow()
         {
-            GetWindow<MaterialSetupEditorWindow>().Show();
+            GetWindow<PrefabSetupEditorWindow>().Show();
         }
 
-        [BoxGroup("Set Material To Children")] 
-        [LabelText("Target Material")]
-        private Material _targetMaterial;
-
-        [BoxGroup("Set Material To Children")] 
+        [BoxGroup("Root Object")] 
         [LabelText("Target Prefab or Scene Object")]
         [SerializeField]
         private GameObject _rootObject;
+        
+        [BoxGroup("Set Material To Children")] 
+        [LabelText("Target Material")]
+        private Material _targetMaterial;
 
         [BoxGroup("Set Material To Children")] 
         [Space] 
@@ -82,11 +83,6 @@ namespace Code.Editors
         private string _meshNameContains;
         
         [BoxGroup("Set Random Material for Matching Mesh")]
-        [LabelText("Root Object")]
-        [SerializeField]
-        private GameObject _rootForMeshSearch;
-        
-        [BoxGroup("Set Random Material for Matching Mesh")]
         [LabelText("Possible Materials")]
         public Material[] _materialsToApply;
         
@@ -95,7 +91,7 @@ namespace Code.Editors
         [GUIColor(0.6f, 1f, 0.6f)]
         private void ApplyRandomMaterialToMatchingMeshNames()
         {
-            if (string.IsNullOrWhiteSpace(_meshNameContains) || _rootForMeshSearch == null || 
+            if (string.IsNullOrWhiteSpace(_meshNameContains) || _rootObject == null || 
                 _materialsToApply == null || _materialsToApply.Length == 0)
             {
                 Debug.LogError("Please assign a mesh name, root object, and at least one material.");
@@ -103,8 +99,8 @@ namespace Code.Editors
             }
 
             int count = 0;
-            MeshFilter[] meshFilters = _rootForMeshSearch.GetComponentsInChildren<MeshFilter>(true);
-            SkinnedMeshRenderer[] skinnedMeshes = _rootForMeshSearch.GetComponentsInChildren<SkinnedMeshRenderer>(true);
+            MeshFilter[] meshFilters = _rootObject.GetComponentsInChildren<MeshFilter>(true);
+            SkinnedMeshRenderer[] skinnedMeshes = _rootObject.GetComponentsInChildren<SkinnedMeshRenderer>(true);
 
             foreach (var meshFilter in meshFilters)
             {
@@ -141,6 +137,66 @@ namespace Code.Editors
                 materials[i] = randomMaterial;
 
             renderer.sharedMaterials = materials;
+        }
+
+        [BoxGroup("Configure MeshRenderer Settings")]
+        [LabelText("Cast Shadows")]
+        [SerializeField]
+        private ShadowCastingMode _castShadows = ShadowCastingMode.On;
+
+        [BoxGroup("Configure MeshRenderer Settings")]
+        [LabelText("Receive Global Illumination")]
+        [SerializeField]
+        private ReceiveGI _receiveGI = ReceiveGI.Lightmaps;
+
+        [BoxGroup("Configure MeshRenderer Settings")]
+        [LabelText("Contribute Global Illumination")]
+        [SerializeField]
+        private bool _contributeGI = true;
+
+        [BoxGroup("Configure MeshRenderer Settings")]
+        [LabelText("Light Probes")]
+        [SerializeField]
+        private LightProbeUsage _lightProbes = LightProbeUsage.BlendProbes;
+
+        [BoxGroup("Configure MeshRenderer Settings")]
+        [LabelText("Motion Vectors")]
+        [SerializeField]
+        private MotionVectorGenerationMode _motionVectors = MotionVectorGenerationMode.Object;
+
+        [BoxGroup("Configure MeshRenderer Settings")]
+        [LabelText("Dynamic Occlusion")]
+        [SerializeField]
+        private bool _dynamicOcclusion = true;
+        
+        [BoxGroup("Configure MeshRenderer Settings")]
+        [Button(ButtonSizes.Large)]
+        [GUIColor(1f, 0.85f, 0.3f)]
+        private void ApplyRendererSettings()
+        {
+            if (_rootObject == null)
+            {
+                Debug.LogError("Assign a root object for MeshRenderer settings.");
+                return;
+            }
+
+            MeshRenderer[] renderers = _rootObject.GetComponentsInChildren<MeshRenderer>(true);
+            int count = 0;
+
+            foreach (var renderer in renderers)
+            {
+                renderer.shadowCastingMode = _castShadows;
+                renderer.receiveGI = _receiveGI;
+                renderer.allowOcclusionWhenDynamic = _dynamicOcclusion;
+                renderer.motionVectorGenerationMode = _motionVectors;
+                renderer.lightProbeUsage = _lightProbes;
+                renderer.receiveShadows = true;
+                renderer.gameObject.isStatic = _contributeGI;
+
+                count++;
+            }
+
+            Debug.Log($"Applied MeshRenderer settings to {count} objects under '{_rootObject.name}'.");
         }
     }
 }
