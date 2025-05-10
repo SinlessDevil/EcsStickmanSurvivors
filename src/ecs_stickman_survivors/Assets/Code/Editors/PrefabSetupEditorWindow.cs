@@ -47,7 +47,7 @@ namespace Code.Editors
         {
             if (_targetMaterial == null || _rootObject == null)
             {
-                Debug.LogError("Please assign both a material and a root object.");
+                Debug.LogError("<color=red>Please assign both a material and a root object.</color>");
                 return;
             }
 
@@ -75,7 +75,7 @@ namespace Code.Editors
                 count++;
             }
 
-            Debug.Log($"Replaced materials in {count} renderers under '{_rootObject.name}'.");
+            Debug.Log($"<color=green>Replaced materials in {count} renderers under '{_rootObject.name}'.</color>");
         }
 
         [BoxGroup("Set Random Material for Matching Mesh")]
@@ -96,7 +96,7 @@ namespace Code.Editors
             if (string.IsNullOrWhiteSpace(_meshNameContains) || _rootObject == null || 
                 _materialsToApply == null || _materialsToApply.Length == 0)
             {
-                Debug.LogError("Please assign a mesh name, root object, and at least one material.");
+                Debug.LogError("<color=red>Please assign a mesh name, root object, and at least one material.</color>");
                 return;
             }
 
@@ -127,7 +127,7 @@ namespace Code.Editors
                 count++;
             }
 
-            Debug.Log($"Replaced materials in {count} renderers where mesh name contains '{_meshNameContains}'.");
+            Debug.Log($"<color=green>Replaced materials in {count} renderers where mesh name contains '{_meshNameContains}'.</color>");
         }
 
         private void ApplyRandomMaterialToRenderer(Renderer renderer)
@@ -178,7 +178,7 @@ namespace Code.Editors
         {
             if (_rootObject == null)
             {
-                Debug.LogError("Assign a root object for MeshRenderer settings.");
+                Debug.LogError("<color=red>Assign a root object for MeshRenderer settings.</color>");
                 return;
             }
 
@@ -198,7 +198,7 @@ namespace Code.Editors
                 count++;
             }
 
-            Debug.Log($"Applied MeshRenderer settings to {count} objects under '{_rootObject.name}'.");
+            Debug.Log($"<color=green>Applied MeshRenderer settings to {count} objects under '{_rootObject.name}'.</color>");
         }
     }
 }
