@@ -34,10 +34,10 @@ public sealed partial class InputMatcher {
 public partial class InputEntity {
 
     public Code.Gameplay.Input.AxisInput axisInput { get { return (Code.Gameplay.Input.AxisInput)GetComponent(InputComponentsLookup.AxisInput); } }
-    public UnityEngine.Vector2 AxisInput { get { return axisInput.Value; } }
+    public UnityEngine.Vector3 AxisInput { get { return axisInput.Value; } }
     public bool hasAxisInput { get { return HasComponent(InputComponentsLookup.AxisInput); } }
 
-    public InputEntity AddAxisInput(UnityEngine.Vector2 newValue) {
+    public InputEntity AddAxisInput(UnityEngine.Vector3 newValue) {
         var index = InputComponentsLookup.AxisInput;
         var component = (Code.Gameplay.Input.AxisInput)CreateComponent(index, typeof(Code.Gameplay.Input.AxisInput));
         component.Value = newValue;
@@ -45,7 +45,7 @@ public partial class InputEntity {
         return this;
     }
 
-    public InputEntity ReplaceAxisInput(UnityEngine.Vector2 newValue) {
+    public InputEntity ReplaceAxisInput(UnityEngine.Vector3 newValue) {
         var index = InputComponentsLookup.AxisInput;
         var component = (Code.Gameplay.Input.AxisInput)CreateComponent(index, typeof(Code.Gameplay.Input.AxisInput));
         component.Value = newValue;

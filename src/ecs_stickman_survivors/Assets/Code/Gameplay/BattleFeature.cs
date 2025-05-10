@@ -29,7 +29,7 @@ namespace Code.Gameplay
             Add(system.Create<BindViewFeature>());
             
             Add(system.Create<HeroFeature>());
-            Add(system.Create<EnemyFeature>());
+            //Add(system.Create<EnemyFeature>());
             Add(system.Create<DeathFeature>());
             
             Add(system.Create<BoosterFeature>());

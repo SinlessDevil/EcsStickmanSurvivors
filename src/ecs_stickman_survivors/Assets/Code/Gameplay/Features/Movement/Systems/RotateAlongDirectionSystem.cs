@@ -20,11 +20,11 @@ namespace Code.Gameplay.Features.Movement.Systems
         {
             foreach (GameEntity entity in _entities)
             {
-                if (entity.Direction.sqrMagnitude >= 0.01f)
-                {
-                    var angle = Mathf.Atan2(entity.Direction.y, entity.Direction.x) * Mathf.Rad2Deg;
-                    entity.Transform.rotation = Quaternion.Euler(0,0, angle);
-                }
+                if (!(entity.Direction.sqrMagnitude >= 0.01f)) 
+                    continue;
+                
+                var angle = Mathf.Atan2(entity.Direction.y, entity.Direction.x) * Mathf.Rad2Deg;
+                entity.Transform.rotation = Quaternion.Euler(0,0, angle);
             }
         }
     }

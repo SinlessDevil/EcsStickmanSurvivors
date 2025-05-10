@@ -34,10 +34,10 @@ public sealed partial class GameMatcher {
 public partial class GameEntity {
 
     public Code.Gameplay.Features.Movement.Direction direction { get { return (Code.Gameplay.Features.Movement.Direction)GetComponent(GameComponentsLookup.Direction); } }
-    public UnityEngine.Vector2 Direction { get { return direction.Value; } }
+    public UnityEngine.Vector3 Direction { get { return direction.Value; } }
     public bool hasDirection { get { return HasComponent(GameComponentsLookup.Direction); } }
 
-    public GameEntity AddDirection(UnityEngine.Vector2 newValue) {
+    public GameEntity AddDirection(UnityEngine.Vector3 newValue) {
         var index = GameComponentsLookup.Direction;
         var component = (Code.Gameplay.Features.Movement.Direction)CreateComponent(index, typeof(Code.Gameplay.Features.Movement.Direction));
         component.Value = newValue;
@@ -45,7 +45,7 @@ public partial class GameEntity {
         return this;
     }
 
-    public GameEntity ReplaceDirection(UnityEngine.Vector2 newValue) {
+    public GameEntity ReplaceDirection(UnityEngine.Vector3 newValue) {
         var index = GameComponentsLookup.Direction;
         var component = (Code.Gameplay.Features.Movement.Direction)CreateComponent(index, typeof(Code.Gameplay.Features.Movement.Direction));
         component.Value = newValue;
