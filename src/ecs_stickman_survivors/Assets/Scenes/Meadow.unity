@@ -3624,7 +3624,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 65
+  field of view: 54.536438
   orthographic: 0
   orthographic size: 5.4
   m_Depth: 0
@@ -3651,7 +3651,7 @@ Transform:
   m_GameObject: {fileID: 2108493402}
   serializedVersion: 2
   m_LocalRotation: {x: 0.37460655, y: 0, z: 0, w: 0.9271839}
-  m_LocalPosition: {x: 0, y: 13.46, z: -10}
+  m_LocalPosition: {x: 0, y: 13.46, z: -12.05}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
