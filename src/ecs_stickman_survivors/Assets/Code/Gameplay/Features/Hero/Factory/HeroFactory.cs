@@ -10,7 +10,9 @@ using UnityEngine;
 namespace Code.Gameplay.Features.Hero.Factory
 {
     public class HeroFactory : IHeroFactory
-    {   
+    {
+        private const string HeroPath = "Gameplay/Heroes/Hero";
+        
         private readonly IIdentifierService _identifierService;
         private readonly IStaticDataService _staticDataService;
 
@@ -29,7 +31,7 @@ namespace Code.Gameplay.Features.Hero.Factory
             Dictionary<Stats, float> baseStats = InitStats.EmptyStatDictionary()
                 .With(x => x[Stats.Speed] = heroConfig.Speed)
                 .With(x => x[Stats.MaxHp] = heroConfig.Hp);
-            
+
             return CreateEntity.Empty()
                 .AddId(_identifierService.Next())
                 .AddWorldPosition(at)
@@ -42,7 +44,7 @@ namespace Code.Gameplay.Features.Hero.Factory
                 .AddCurrentHp(baseStats[Stats.MaxHp])
                 .AddMaxHp(baseStats[Stats.MaxHp])
                 .AddExperience(0)
-                .AddViewPath("Gameplay/Hero/hero")
+                .AddViewPath(HeroPath)
                 .AddPickupRadius(1)
                 .With(x => x.isHero = true)
                 .With(x => x.isTurnedAlongDirection = true)

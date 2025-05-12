@@ -47,7 +47,7 @@ GameObject:
   - component: {fileID: -2241287277873108418}
   - component: {fileID: 6793674574290132233}
   m_Layer: 6
-  m_Name: hero
+  m_Name: Hero
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -121,8 +121,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d7310d8cce844a7b673c1a4fb574341, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Animator: {fileID: 4579866735478409500}
-  SpriteRenderer: {fileID: 2144268021912294448}
+  _aniamtor: {fileID: 1447789535269977775}
+  _skinnedMeshRenderer: {fileID: 6023236714047828199}
+  _materialDamageTaken: {fileID: 2100000, guid: 79be013f7aa39ae42b25e71b4feab3d0, type: 2}
+  _materialHealTaken: {fileID: 2100000, guid: 410fd690a9927b845baa4665b00c879b, type: 2}
+  _materialIndex: 1
+  _blinkCount: 2
+  _blinkDuration: 0.1
 --- !u!114 &6793674574290132233
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1816,11 +1821,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: -8435245712485981826, guid: 81a2bb11befaeda47a74df8e92c1fa28, type: 3}
---- !u!212 &2144268021912294448 stripped
-SpriteRenderer:
-  m_CorrespondingSourceObject: {fileID: 3626916397498700004, guid: 81a2bb11befaeda47a74df8e92c1fa28, type: 3}
-  m_PrefabInstance: {fileID: 3428538221841925332}
-  m_PrefabAsset: {fileID: 0}
 --- !u!95 &4579866735478409500 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 1160356261127867848, guid: 81a2bb11befaeda47a74df8e92c1fa28, type: 3}

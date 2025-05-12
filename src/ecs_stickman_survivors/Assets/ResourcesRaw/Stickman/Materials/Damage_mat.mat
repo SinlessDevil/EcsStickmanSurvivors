@@ -20,9 +20,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: DamageMaterial
-  m_Shader: {fileID: -6465566751694194690, guid: 44245ab89240f51459a5077d7145c452,
-    type: 3}
+  m_Name: Damage_mat
+  m_Shader: {fileID: -6465566751694194690, guid: 44245ab89240f51459a5077d7145c452, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -126,7 +125,7 @@ Material:
     - _WorkflowMode: 1
     - _ZWrite: 1
     m_Colors:
-    - _BASE_COLOR: {r: 1, g: 1, b: 1, a: 1}
+    - _BASE_COLOR: {r: 0.8018868, g: 0.003782494, b: 0.003782494, a: 1}
     - _BaseColor: {r: 0.8, g: 0.8, b: 0.8, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EMISSION_COLOR: {r: 0, g: 0, b: 0, a: 1}
