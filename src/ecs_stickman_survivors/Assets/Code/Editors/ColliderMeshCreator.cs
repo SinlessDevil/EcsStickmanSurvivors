@@ -42,12 +42,17 @@ namespace Code.Editors
                 return;
             }
 
-            var allPoints = new List<Vector3>();
-            foreach (var filter in targetMeshFilters)
+            // Создаём объединённый объект и получаем mesh
+            GameObject combinedGO = CreateCombinedMeshObject(targetMeshFilters, debugMaterial);
+            if (combinedGO == null)
             {
-                if (filter == null || filter.sharedMesh == null) continue;
-                allPoints.AddRange(ExtractMeshOutlineXZ(filter));
+                Debug.LogError("Failed to combine meshes.");
+                return;
             }
+
+            // Создаём временный MeshFilter чтобы извлечь outline
+            var mfTemp = combinedGO.GetComponent<MeshFilter>();
+            var allPoints = ExtractMeshOutlineXZ(mfTemp);
 
             if (allPoints.Count == 0)
             {
@@ -74,6 +79,36 @@ namespace Code.Editors
             col.convex = false;
 
             Debug.Log("Collider mesh generated successfully.");
+        }
+
+        private GameObject CreateCombinedMeshObject(List<MeshFilter> meshFilters, Material mat = null)
+        {
+            var combine = new List<CombineInstance>();
+
+            foreach (var аа in meshFilters)
+            {
+                if (аа == null || аа.sharedMesh == null) continue;
+
+                combine.Add(new CombineInstance
+                {
+                    mesh = аа.sharedMesh,
+                    transform = аа.transform.localToWorldMatrix
+                });
+            }
+
+            if (combine.Count == 0) return null;
+
+            var combinedMesh = new Mesh { name = "CombinedMesh" };
+            combinedMesh.CombineMeshes(combine.ToArray(), true, true, false);
+
+            var go = new GameObject("CombinedMeshObject");
+            var mf = go.AddComponent<MeshFilter>();
+            mf.sharedMesh = combinedMesh;
+
+            var mr = go.AddComponent<MeshRenderer>();
+            mr.sharedMaterial = mat ?? new Material(Shader.Find("Standard"));
+
+            return go;
         }
 
         private List<Vector3> ExtractMeshOutlineXZ(MeshFilter meshFilter)
@@ -118,17 +153,24 @@ namespace Code.Editors
             var outline = new List<Vector3> { boundaryEdges[0].Item1, boundaryEdges[0].Item2 };
             boundaryEdges.RemoveAt(0);
 
-            while (boundaryEdges.Count > 0)
+            int safety = 10000;
+            while (boundaryEdges.Count > 0 && safety-- > 0)
             {
                 var last = outline[^1];
                 var nextEdge = boundaryEdges.Find(e => e.Item1 == last || e.Item2 == last);
-                if (nextEdge.Item1 == last)
-                    outline.Add(nextEdge.Item2);
-                else
-                    outline.Add(nextEdge.Item1);
 
+                if (nextEdge.Equals(default((Vector3, Vector3))))
+                {
+                    Debug.LogWarning("Cannot find next connected edge, outline may be broken.");
+                    break;
+                }
+
+                outline.Add(nextEdge.Item1 == last ? nextEdge.Item2 : nextEdge.Item1);
                 boundaryEdges.Remove(nextEdge);
             }
+
+            if (safety <= 0)
+                Debug.LogError("Infinite loop protection triggered in outline generation.");
 
             return outline;
         }
