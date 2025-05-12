@@ -7,5 +7,6 @@ namespace Code.Gameplay.Features.Hero.Configs
     {
         public float Hp = 100;
         public float Speed = 3;
+        public float SpeedRotation = 5;
     }
 }

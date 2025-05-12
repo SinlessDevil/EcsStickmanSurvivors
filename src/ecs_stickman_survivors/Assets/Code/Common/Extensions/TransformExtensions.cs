@@ -4,21 +4,21 @@ namespace Code.Common.Extensions
 {
     public static class TransformExtensions
     {
-        public static Transform SetWorldXY(this Transform transform, float x, float y)
-        {
-            transform.position = new Vector3(x, y, transform.position.z);
-            return transform;
-        }
-
         public static Transform SetWorldPosition(this Transform transform, Vector3 position)
         {
             transform.position += position;
             return transform;
         }
         
-        public static Transform SetWorldPositionWitOffset(this Transform transform, Vector3 position, Vector3 offset)
+        public static Transform SetWorldXY(this Transform transform, float x, float y)
         {
-            transform.position = position + offset;
+            transform.position = new Vector3(x, y, transform.position.z);
+            return transform;
+        }
+
+        public static Transform SetWorldX(this Transform transform, float x)
+        {
+            transform.position = transform.position.SetX(x);
             return transform;
         }
         
@@ -26,12 +26,6 @@ namespace Code.Common.Extensions
         {
             Vector3 targetPos = target + offset;
             transform.position = Vector3.Lerp(transform.position, targetPos, Time.deltaTime * speed);
-            return transform;
-        }
-        
-        public static Transform SetWorldX(this Transform transform, float x)
-        {
-            transform.position = transform.position.SetX(x);
             return transform;
         }
 
@@ -91,5 +85,6 @@ namespace Code.Common.Extensions
             transform.localPosition = transform.localPosition.AddX(y);
             return transform;
         }
+        
     }
 }

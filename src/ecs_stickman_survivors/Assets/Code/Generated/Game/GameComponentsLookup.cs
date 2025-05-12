@@ -89,44 +89,46 @@ public static class GameComponentsLookup {
     public const int Pulling = 78;
     public const int Destination = 79;
     public const int Direction = 80;
-    public const int MovementAvailable = 81;
-    public const int Moving = 82;
-    public const int MovingProcess = 83;
-    public const int OrbitCenterFollowTarget = 84;
-    public const int OrbitCenterPosition = 85;
-    public const int OrbitPhase = 86;
-    public const int OrbitRadius = 87;
-    public const int RotationAlignedByDirection = 88;
-    public const int Speed = 89;
-    public const int TargetPosition = 90;
-    public const int TurnedAlongDirection = 91;
-    public const int Affected = 92;
-    public const int Applied = 93;
-    public const int ApplierStatusLink = 94;
-    public const int Duration = 95;
-    public const int Freeze = 96;
-    public const int Hex = 97;
-    public const int Invulnerability = 98;
-    public const int MaxHpUp = 99;
-    public const int Period = 100;
-    public const int Poison = 101;
-    public const int SpeedUp = 102;
-    public const int Status = 103;
-    public const int StatusTypeId = 104;
-    public const int TimeLeft = 105;
-    public const int TimeSinceLastTick = 106;
-    public const int Unapplied = 107;
-    public const int CollectingTargetsContinuously = 108;
-    public const int CollectTargetsInterval = 109;
-    public const int CollectTargetsTimer = 110;
-    public const int LayerMask = 111;
-    public const int ProcessedTargets = 112;
-    public const int Radius = 113;
-    public const int Reached = 114;
-    public const int ReadyToCollectTargets = 115;
-    public const int TargetsBuffer = 116;
+    public const int LastDirection = 81;
+    public const int MovementAvailable = 82;
+    public const int Moving = 83;
+    public const int MovingProcess = 84;
+    public const int OrbitCenterFollowTarget = 85;
+    public const int OrbitCenterPosition = 86;
+    public const int OrbitPhase = 87;
+    public const int OrbitRadius = 88;
+    public const int Rotation = 89;
+    public const int RotationAlignedByDirection = 90;
+    public const int Speed = 91;
+    public const int TargetPosition = 92;
+    public const int TurnedAlongDirection = 93;
+    public const int Affected = 94;
+    public const int Applied = 95;
+    public const int ApplierStatusLink = 96;
+    public const int Duration = 97;
+    public const int Freeze = 98;
+    public const int Hex = 99;
+    public const int Invulnerability = 100;
+    public const int MaxHpUp = 101;
+    public const int Period = 102;
+    public const int Poison = 103;
+    public const int SpeedUp = 104;
+    public const int Status = 105;
+    public const int StatusTypeId = 106;
+    public const int TimeLeft = 107;
+    public const int TimeSinceLastTick = 108;
+    public const int Unapplied = 109;
+    public const int CollectingTargetsContinuously = 110;
+    public const int CollectTargetsInterval = 111;
+    public const int CollectTargetsTimer = 112;
+    public const int LayerMask = 113;
+    public const int ProcessedTargets = 114;
+    public const int Radius = 115;
+    public const int Reached = 116;
+    public const int ReadyToCollectTargets = 117;
+    public const int TargetsBuffer = 118;
 
-    public const int TotalComponents = 117;
+    public const int TotalComponents = 119;
 
     public static readonly string[] componentNames = {
         "Destructed",
@@ -210,6 +212,7 @@ public static class GameComponentsLookup {
         "Pulling",
         "Destination",
         "Direction",
+        "LastDirection",
         "MovementAvailable",
         "Moving",
         "MovingProcess",
@@ -217,6 +220,7 @@ public static class GameComponentsLookup {
         "OrbitCenterPosition",
         "OrbitPhase",
         "OrbitRadius",
+        "Rotation",
         "RotationAlignedByDirection",
         "Speed",
         "TargetPosition",
@@ -330,6 +334,7 @@ public static class GameComponentsLookup {
         typeof(Code.Gameplay.Features.Loot.Pulling),
         typeof(Code.Gameplay.Features.Movement.Destination),
         typeof(Code.Gameplay.Features.Movement.Direction),
+        typeof(Code.Gameplay.Features.Movement.LastDirection),
         typeof(Code.Gameplay.Features.Movement.MovementAvailable),
         typeof(Code.Gameplay.Features.Movement.Moving),
         typeof(Code.Gameplay.Features.Movement.MovingProcess),
@@ -337,6 +342,7 @@ public static class GameComponentsLookup {
         typeof(Code.Gameplay.Features.Movement.OrbitCenterPosition),
         typeof(Code.Gameplay.Features.Movement.OrbitPhase),
         typeof(Code.Gameplay.Features.Movement.OrbitRadius),
+        typeof(Code.Gameplay.Features.Movement.Rotation),
         typeof(Code.Gameplay.Features.Movement.RotationAlignedByDirection),
         typeof(Code.Gameplay.Features.Movement.Speed),
         typeof(Code.Gameplay.Features.Movement.TargetPosition),

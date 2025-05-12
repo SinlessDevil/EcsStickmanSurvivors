@@ -34,6 +34,8 @@ namespace Code.Gameplay.Features.Hero.Factory
                 .AddId(_identifierService.Next())
                 .AddWorldPosition(at)
                 .AddDirection(Vector2.zero)
+                .AddLastDirection(Vector3.zero)
+                .AddRotation(heroConfig.SpeedRotation)
                 .AddBaseStats(baseStats)
                 .AddStatModifiers(InitStats.EmptyStatDictionary())
                 .AddSpeed(baseStats[Stats.Speed])
