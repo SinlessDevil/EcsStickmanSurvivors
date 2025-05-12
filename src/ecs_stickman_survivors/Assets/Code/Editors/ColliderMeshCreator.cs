@@ -15,16 +15,20 @@ namespace Code.Editors
             GetWindow<ColliderMeshEditorWindow>().Show();
         }
 
-        [BoxGroup("Collider Mesh Generation")] [LabelText("Target Mesh Filter")]
-        public MeshFilter targetMeshFilter;
+        [BoxGroup("Collider Mesh Generation")]
+        [LabelText("Target Mesh Filters")]
+        public List<MeshFilter> targetMeshFilters = new();
 
-        [BoxGroup("Collider Mesh Generation")] [LabelText("YOffset")]
+        [BoxGroup("Collider Mesh Generation")]
+        [LabelText("YOffset")]
         public float yOffset = 0.1f;
 
-        [BoxGroup("Collider Mesh Generation")] [LabelText("Extrusion Thickness")]
+        [BoxGroup("Collider Mesh Generation")]
+        [LabelText("Extrusion Thickness")]
         public float extrusion = 1f;
 
-        [BoxGroup("Collider Mesh Generation")] [LabelText("Debug Material")]
+        [BoxGroup("Collider Mesh Generation")]
+        [LabelText("Debug Material")]
         public Material debugMaterial;
 
         [BoxGroup("Collider Mesh Generation")]
@@ -32,17 +36,30 @@ namespace Code.Editors
         [GUIColor(0.3f, 0.9f, 0.4f)]
         private void GenerateCollider()
         {
-            if (targetMeshFilter == null || targetMeshFilter.sharedMesh == null)
+            if (targetMeshFilters == null || targetMeshFilters.Count == 0)
             {
-                Debug.LogError("Missing target mesh filter.");
+                Debug.LogError("No target mesh filters assigned.");
                 return;
             }
 
-            var edgePoints = ExtractMeshOutlineXZ(targetMeshFilter);
-            var mesh = GenerateExtrudedMesh(edgePoints, yOffset, extrusion);
+            var allPoints = new List<Vector3>();
+            foreach (var filter in targetMeshFilters)
+            {
+                if (filter == null || filter.sharedMesh == null) continue;
+                allPoints.AddRange(ExtractMeshOutlineXZ(filter));
+            }
+
+            if (allPoints.Count == 0)
+            {
+                Debug.LogError("No valid mesh data found.");
+                return;
+            }
+
+            var orderedPoints = ConvexHullXZ(allPoints);
+            var mesh = GenerateExtrudedMesh(orderedPoints, yOffset, extrusion);
 
             GameObject container = new GameObject("Generated_Collider");
-            container.transform.SetParent(targetMeshFilter.transform);
+            container.transform.SetParent(null);
             container.transform.localPosition = Vector3.zero;
             container.transform.localRotation = Quaternion.identity;
 
@@ -71,9 +88,9 @@ namespace Code.Editors
             {
                 Vector3[] triVerts =
                 {
-                    new Vector3(vertices[triangles[i]].x, 0, vertices[triangles[i]].z),
-                    new Vector3(vertices[triangles[i + 1]].x, 0, vertices[triangles[i + 1]].z),
-                    new Vector3(vertices[triangles[i + 2]].x, 0, vertices[triangles[i + 2]].z)
+                    new(vertices[triangles[i]].x, 0, vertices[triangles[i]].z),
+                    new(vertices[triangles[i + 1]].x, 0, vertices[triangles[i + 1]].z),
+                    new(vertices[triangles[i + 2]].x, 0, vertices[triangles[i + 2]].z)
                 };
 
                 void AddEdge(Vector3 a, Vector3 b)
@@ -91,12 +108,19 @@ namespace Code.Editors
             }
 
             var boundaryEdges = edgeCount.Where(e => e.Value == 1).Select(e => e.Key).ToList();
+
+            if (boundaryEdges.Count == 0)
+            {
+                Debug.LogWarning($"No boundary edges found for mesh: {meshFilter.name}");
+                return new List<Vector3>();
+            }
+
             var outline = new List<Vector3> { boundaryEdges[0].Item1, boundaryEdges[0].Item2 };
             boundaryEdges.RemoveAt(0);
 
             while (boundaryEdges.Count > 0)
             {
-                var last = outline[outline.Count - 1];
+                var last = outline[^1];
                 var nextEdge = boundaryEdges.Find(e => e.Item1 == last || e.Item2 == last);
                 if (nextEdge.Item1 == last)
                     outline.Add(nextEdge.Item2);
@@ -107,6 +131,36 @@ namespace Code.Editors
             }
 
             return outline;
+        }
+
+        private List<Vector3> ConvexHullXZ(List<Vector3> points)
+        {
+            var sorted = points.Distinct().OrderBy(p => p.x).ThenBy(p => p.z).ToList();
+
+            List<Vector3> hull = new();
+            foreach (var p in sorted)
+            {
+                while (hull.Count >= 2 && CrossXZ(hull[^2], hull[^1], p) <= 0)
+                    hull.RemoveAt(hull.Count - 1);
+                hull.Add(p);
+            }
+
+            int t = hull.Count + 1;
+            for (int i = sorted.Count - 2; i >= 0; i--)
+            {
+                var p = sorted[i];
+                while (hull.Count >= t && CrossXZ(hull[^2], hull[^1], p) <= 0)
+                    hull.RemoveAt(hull.Count - 1);
+                hull.Add(p);
+            }
+
+            hull.RemoveAt(hull.Count - 1);
+            return hull;
+        }
+
+        private float CrossXZ(Vector3 a, Vector3 b, Vector3 c)
+        {
+            return (b.x - a.x) * (c.z - a.z) - (b.z - a.z) * (c.x - a.x);
         }
 
         private Mesh GenerateExtrudedMesh(List<Vector3> path, float height, float thickness)
@@ -127,8 +181,8 @@ namespace Code.Editors
                 verts.Add(lowerA);
                 verts.Add(lowerB);
 
-                tris.AddRange(new[] { start + 0, start + 1, start + 2 });
-                tris.AddRange(new[] { start + 1, start + 3, start + 2 });
+                tris.AddRange(new[] { start + 0, start + 2, start + 1 });
+                tris.AddRange(new[] { start + 1, start + 2, start + 3 });
             }
 
             var mesh = new Mesh();
