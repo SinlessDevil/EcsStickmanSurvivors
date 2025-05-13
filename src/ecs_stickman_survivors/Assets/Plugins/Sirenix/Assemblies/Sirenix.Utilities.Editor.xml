@@ -2192,7 +2192,7 @@
              <code>
              private GUITable table;
             
-             private void Init()
+             private void DemoTestConcavity()
              {
                  bool[,] boolArr = new bool[20,20];
             
@@ -2217,7 +2217,7 @@
              <code>
              private GUITable table;
             
-             private void Init()
+             private void DemoTestConcavity()
              {
                  Listt&lt;SomeClasst&gt; someList = new List&lt;SomeClass&gt;() { new SomeClass(), new SomeClass(), new SomeClass() };
             
