@@ -35,7 +35,12 @@ namespace Code.Editors
         [BoxGroup("Collider Mesh Generation")] [LabelText("Scale Factor")]
         [MinValue(0.01f)]
         public float scaleFactor = 1f;
-        
+
+        [BoxGroup("Collider Mesh Generation")]
+        [LabelText("Y Threshold")]
+        [Range(0.001f, 15f)]
+        public float yThreshold = 0.05f;
+
         [BoxGroup("Collider Mesh Generation")]
         [Button(ButtonSizes.Large)]
         [GUIColor(0.3f, 0.9f, 0.4f)]
@@ -57,7 +62,8 @@ namespace Code.Editors
             }
 
             var worldPoints = targetMeshFilter.sharedMesh.vertices
-                .Select(v => targetMeshFilter.transform.TransformPoint(v))
+                .Select(v => targetMeshFilter.transform
+                    .TransformPoint(v))
                 .Select(p => new Vector3(p.x, 0, p.z))
                 .ToList();
 
@@ -82,27 +88,22 @@ namespace Code.Editors
             Debug.Log("Collider mesh generated successfully.");
         }
 
-        private List<Vector3> GenerateConcaveHullXZ(List<Vector3> points, double concavity = 0.5f, 
+        private List<Vector3> GenerateConcaveHullXZ(List<Vector3> points, double concavity = 0.5,
             double scaleFactor = 1.5f)
         {
             Hull.CleanUp();
-            
-            List<Node> nodes = new();
-            for (int i = 0; i < points.Count; i++)
-            {
-                var p = points[i];
-                nodes.Add(new Node(p.x, p.z, i));
-            }
-            
+
+            List<Node> nodes = points.Select((p, i) => new Node(p.x, p.z, i)).ToList();
+
             Hull.SetConvexHull(nodes);
             Hull.SetConcaveHull(concavity, scaleFactor);
-            
+
             var outline = new List<Vector3>();
             var edges = Hull.HullConcaveEdges;
 
-            if (edges.Count == 0) 
+            if (edges.Count == 0)
                 return outline;
-            
+
             var current = edges[0];
             outline.Add(new Vector3((float)current.Nodes[0].X, 0, (float)current.Nodes[0].Y));
             outline.Add(new Vector3((float)current.Nodes[1].X, 0, (float)current.Nodes[1].Y));
@@ -116,7 +117,7 @@ namespace Code.Editors
                     (float)e.Nodes[0].X == last.x && (float)e.Nodes[0].Y == last.z ||
                     (float)e.Nodes[1].X == last.x && (float)e.Nodes[1].Y == last.z);
 
-                if (index == -1) 
+                if (index == -1)
                     break;
 
                 var e = edges[index];
@@ -130,7 +131,7 @@ namespace Code.Editors
 
             return outline;
         }
-        
+
         private Mesh GenerateExtrudedMesh(List<Vector3> path, float height, float thickness)
         {
             var verts = new List<Vector3>();
@@ -163,11 +164,7 @@ namespace Code.Editors
 
         private GameObject CreateCombinedMeshObject(List<MeshFilter> meshFilters, Material mat = null)
         {
-            var allVertices = new List<Vector3>();
-            var allTriangles = new List<int>();
-            var vertexMap = new Dictionary<Vector3, int>();
-
-            float mergeThreshold = 0.001f;
+            var allPoints = new List<Vector3>();
 
             foreach (var mf in meshFilters)
             {
@@ -176,58 +173,37 @@ namespace Code.Editors
 
                 var mesh = mf.sharedMesh;
                 var matrix = mf.transform.localToWorldMatrix;
-                var vertices = mesh.vertices;
-                var triangles = mesh.triangles;
 
-                for (int i = 0; i < triangles.Length; i += 3)
+                foreach (var v in mesh.vertices)
                 {
-                    for (int j = 0; j < 3; j++)
-                    {
-                        var worldV = matrix.MultiplyPoint3x4(vertices[triangles[i + j]]);
-                        worldV = new Vector3(worldV.x, 0, worldV.z);
-
-                        int index;
-                        if (!TryGetMergedIndex(worldV, allVertices, vertexMap, mergeThreshold, out index))
-                        {
-                            index = allVertices.Count;
-                            allVertices.Add(worldV);
-                            vertexMap[worldV] = index;
-                        }
-
-                        allTriangles.Add(index);
-                    }
+                    allPoints.Add(matrix.MultiplyPoint3x4(v));
                 }
             }
 
-            var meshResult = new Mesh { name = "MergedMesh" };
-            meshResult.SetVertices(allVertices);
-            meshResult.SetTriangles(allTriangles, 0);
-            meshResult.RecalculateNormals();
+            if (allPoints.Count == 0)
+                return null;
+
+            float minY = allPoints.Min(p => p.y);
+            float maxY = allPoints.Max(p => p.y);
+
+            var finalPoints = allPoints
+                .Where(p => Mathf.Abs(p.y - maxY) <= yThreshold || Mathf.Abs(p.y - minY) <= yThreshold)
+                .ToList();
+
+            var flattenedPoints = finalPoints.Select(p => new Vector3(p.x, p.y, p.z)).ToList();
+
+            var mesh1 = new Mesh { name = "FlatPointsPreview" };
+            mesh1.SetVertices(flattenedPoints);
+            mesh1.SetIndices(Enumerable.Range(0, flattenedPoints.Count).ToArray(), MeshTopology.Points, 0);
 
             var go = new GameObject("CombinedMeshObject");
             var mfNew = go.AddComponent<MeshFilter>();
-            mfNew.sharedMesh = meshResult;
+            mfNew.sharedMesh = mesh1;
 
             var mrNew = go.AddComponent<MeshRenderer>();
             mrNew.sharedMaterial = mat ?? new Material(Shader.Find("Standard"));
 
             return go;
-        }
-        
-        private bool TryGetMergedIndex(Vector3 point, List<Vector3> existing, Dictionary<Vector3, int> map,
-            float threshold, out int index)
-        {
-            foreach (var kvp in map)
-            {
-                if (Vector3.Distance(kvp.Key, point) <= threshold)
-                {
-                    index = kvp.Value;
-                    return true;
-                }
-            }
-
-            index = -1;
-            return false;
         }
     }
 }
