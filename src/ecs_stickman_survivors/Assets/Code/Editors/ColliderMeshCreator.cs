@@ -5,6 +5,7 @@ using Sirenix.OdinInspector;
 using Sirenix.OdinInspector.Editor;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Code.Editors
 {
@@ -16,74 +17,99 @@ namespace Code.Editors
             GetWindow<ColliderMeshEditorWindow>().Show();
         }
 
-        [BoxGroup("Collider Mesh Generation")] [LabelText("Target Mesh Filters")]
-        public List<MeshFilter> targetMeshFilters = new();
+        [FormerlySerializedAs("targetMeshFilters")]
+        [BoxGroup("Collider Mesh Generation")]
+        [LabelText("Target Mesh Filters")]
+        [SerializeField]
+        private List<MeshFilter> _targetMeshFilters = new();
 
-        [BoxGroup("Collider Mesh Generation")] [LabelText("YOffset")]
-        public float yOffset = 0.1f;
+        [FormerlySerializedAs("yOffset")] 
+        [BoxGroup("Collider Mesh Generation")] 
+        [LabelText("YOffset")] 
+        [SerializeField]
+        private float _yOffset = 0.1f;
 
-        [BoxGroup("Collider Mesh Generation")] [LabelText("Extrusion Thickness")]
-        public float extrusion = 1f;
+        [FormerlySerializedAs("extrusion")]
+        [BoxGroup("Collider Mesh Generation")]
+        [LabelText("Extrusion Thickness")]
+        [SerializeField]
+        private float _extrusion = 1f;
 
-        [BoxGroup("Collider Mesh Generation")] [LabelText("Debug Material")]
-        public Material debugMaterial;
-
-        [BoxGroup("Collider Mesh Generation")] [LabelText("Concavity (-1 to 1)")]
-        [Range(-1f, 1f)]
-        public float concavity = 0.5f;
-
-        [BoxGroup("Collider Mesh Generation")] [LabelText("Scale Factor")]
-        [MinValue(0.01f)]
-        public float scaleFactor = 1f;
+        [FormerlySerializedAs("debugMaterial")]
+        [BoxGroup("Collider Mesh Generation")]
+        [LabelText("Debug Material")]
+        [SerializeField]
+        private Material _debugMaterial;
 
         [BoxGroup("Collider Mesh Generation")]
-        [LabelText("Y Threshold")]
-        [Range(0.001f, 15f)]
-        public float yThreshold = 0.05f;
+        [LabelText("Concavity (-1 to 1)")] 
+        [Range(-1f, 1f)] 
+        [SerializeField]
+        private float _concavity = 0.5f;
+
+        [BoxGroup("Collider Mesh Generation")] 
+        [LabelText("Scale Factor")] 
+        [MinValue(0.01f)] 
+        [SerializeField]
+        private float _scaleFactor = 1f;
+
+        [BoxGroup("Collider Mesh Generation")] 
+        [LabelText("Y Threshold")] 
+        [Range(0.001f, 15f)] 
+        [SerializeField]
+        private float _yThreshold = 0.05f;
 
         [BoxGroup("Collider Mesh Generation")]
         [Button(ButtonSizes.Large)]
         [GUIColor(0.3f, 0.9f, 0.4f)]
         private void GenerateCollider()
         {
-            GameObject combinedGO = CreateCombinedMeshObject(targetMeshFilters, debugMaterial);
-            if (combinedGO == null)
+            var worldPoints = new List<Vector3>();
+
+            foreach (var targetMeshFilter in _targetMeshFilters)
             {
-                Debug.LogError("Failed to combine meshes.");
+                if (targetMeshFilter == null || targetMeshFilter.sharedMesh == null)
+                    continue;
+
+                var sharedMesh = targetMeshFilter.sharedMesh;
+                var matrix = targetMeshFilter.transform.localToWorldMatrix;
+
+                worldPoints.AddRange(sharedMesh.vertices
+                    .Select(v => matrix
+                    .MultiplyPoint3x4(v)));
+            }
+
+            if (worldPoints.Count == 0)
+            {
+                Debug.LogError("No vertices found in the provided MeshFilters.");
                 return;
             }
 
-            var targetMeshFilter = combinedGO.GetComponent<MeshFilter>();
+            float minY = worldPoints.Min(p => p.y);
+            float maxY = worldPoints.Max(p => p.y);
 
-            if (targetMeshFilter == null || targetMeshFilter.sharedMesh == null)
-            {
-                Debug.LogError("Missing target mesh filter.");
-                return;
-            }
-
-            var worldPoints = targetMeshFilter.sharedMesh.vertices
-                .Select(v => targetMeshFilter.transform
-                    .TransformPoint(v))
+            var filteredPoints = worldPoints
+                .Where(p => Mathf.Abs(p.y - maxY) <= _yThreshold || Mathf.Abs(p.y - minY) <= _yThreshold)
                 .Select(p => new Vector3(p.x, 0, p.z))
                 .ToList();
 
-            var edgePoints = GenerateConcaveHullXZ(worldPoints, concavity, scaleFactor);
-            var mesh = GenerateExtrudedMesh(edgePoints, yOffset, extrusion);
+            var edgePoints = GenerateConcaveHullXZ(filteredPoints, _concavity, _scaleFactor);
+            var mesh = GenerateExtrudedMesh(edgePoints, _yOffset, _extrusion);
 
             GameObject container = new GameObject("Generated_Collider");
-            container.transform.SetParent(targetMeshFilter.transform);
+            container.transform.SetParent(null);
             container.transform.localPosition = Vector3.zero;
             container.transform.localRotation = Quaternion.identity;
 
-            var mf = container.AddComponent<MeshFilter>();
-            mf.sharedMesh = mesh;
+            var meshFilter = container.AddComponent<MeshFilter>();
+            meshFilter.sharedMesh = mesh;
 
-            var mr = container.AddComponent<MeshRenderer>();
-            mr.sharedMaterial = debugMaterial;
+            var meshRenderer = container.AddComponent<MeshRenderer>();
+            meshRenderer.sharedMaterial = _debugMaterial;
 
-            var col = container.AddComponent<MeshCollider>();
-            col.sharedMesh = mesh;
-            col.convex = false;
+            var meshCollider = container.AddComponent<MeshCollider>();
+            meshCollider.sharedMesh = mesh;
+            meshCollider.convex = false;
 
             Debug.Log("Collider mesh generated successfully.");
         }
@@ -160,50 +186,6 @@ namespace Code.Editors
             mesh.SetTriangles(tris, 0);
             mesh.RecalculateNormals();
             return mesh;
-        }
-
-        private GameObject CreateCombinedMeshObject(List<MeshFilter> meshFilters, Material mat = null)
-        {
-            var allPoints = new List<Vector3>();
-
-            foreach (var mf in meshFilters)
-            {
-                if (mf == null || mf.sharedMesh == null) 
-                    continue;
-
-                var mesh = mf.sharedMesh;
-                var matrix = mf.transform.localToWorldMatrix;
-
-                foreach (var v in mesh.vertices)
-                {
-                    allPoints.Add(matrix.MultiplyPoint3x4(v));
-                }
-            }
-
-            if (allPoints.Count == 0)
-                return null;
-
-            float minY = allPoints.Min(p => p.y);
-            float maxY = allPoints.Max(p => p.y);
-
-            var finalPoints = allPoints
-                .Where(p => Mathf.Abs(p.y - maxY) <= yThreshold || Mathf.Abs(p.y - minY) <= yThreshold)
-                .ToList();
-
-            var flattenedPoints = finalPoints.Select(p => new Vector3(p.x, p.y, p.z)).ToList();
-
-            var mesh1 = new Mesh { name = "FlatPointsPreview" };
-            mesh1.SetVertices(flattenedPoints);
-            mesh1.SetIndices(Enumerable.Range(0, flattenedPoints.Count).ToArray(), MeshTopology.Points, 0);
-
-            var go = new GameObject("CombinedMeshObject");
-            var mfNew = go.AddComponent<MeshFilter>();
-            mfNew.sharedMesh = mesh1;
-
-            var mrNew = go.AddComponent<MeshRenderer>();
-            mrNew.sharedMaterial = mat ?? new Material(Shader.Find("Standard"));
-
-            return go;
         }
     }
 }
