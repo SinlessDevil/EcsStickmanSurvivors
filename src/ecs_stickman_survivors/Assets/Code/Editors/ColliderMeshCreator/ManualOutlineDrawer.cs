@@ -5,10 +5,13 @@ using UnityEngine;
 
 namespace Code.Editors.ColliderMeshCreator
 {
+    [ExecuteAlways]
     public class ManualOutlineDrawer : MonoBehaviour
     {
-        [SerializeField] private List<Vector3> _points = new();
-        [Space(10)] [Header("Gizmos Settings")]
+        [SerializeField]
+        private List<Vector3> _points = new();
+
+        [Space(10), Header("Gizmos Settings")]
         [SerializeField] private Color _lineColor = Color.green;
         [SerializeField] private Color _pointColor = Color.red;
         [SerializeField] private float _pointSize = 0.2f;
@@ -44,14 +47,14 @@ namespace Code.Editors.ColliderMeshCreator
                 Gizmos.DrawSphere(transform.TransformPoint(point), _pointSize);
             }
         }
-        
-        [Button]
+
+        [Button("Add Point")]
         private void AddPoint()
         {
             Undo.RecordObject(this, "Add Point");
             Vector3 newPoint = _points.Count > 0 ? _points[^1] + Vector3.right : Vector3.zero;
             _points.Add(newPoint);
             EditorUtility.SetDirty(this);
-        } 
+        }
     }
 }

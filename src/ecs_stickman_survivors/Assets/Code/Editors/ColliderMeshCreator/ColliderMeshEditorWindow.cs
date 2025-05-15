@@ -11,7 +11,8 @@ namespace Code.Editors.ColliderMeshCreator
 {
     public class ColliderMeshEditorWindow : OdinEditorWindow
     {
-
+        private const string InsertKeyPrefsKey = "ColliderMesh_InsertKey";
+        
         [MenuItem("Tools/Collider Mesh Generator Editor Window")]
         private static void OpenWindow()
         {
@@ -106,7 +107,62 @@ namespace Code.Editors.ColliderMeshCreator
 
             Debug.Log("Collider mesh generated successfully.");
         }
+        
+        [BoxGroup("Manual Outline")]
+        [LabelText("Line Color")]
+        [SerializeField]
+        private Color _manualLineColor = Color.green;
 
+        [BoxGroup("Manual Outline")]
+        [LabelText("Point Color")]
+        [SerializeField]
+        private Color _manualPointColor = Color.red;
+
+        [BoxGroup("Manual Outline")]
+        [LabelText("Point Size")]
+        [SerializeField]
+        private float _manualPointSize = 0.2f;
+        
+        [BoxGroup("Manual Outline")]
+        [LabelText("Insert Point Key")]
+        [SerializeField]
+        private KeyCode _insertKey = KeyCode.Q;
+        
+        [BoxGroup("Manual Outline")]
+        [Button(ButtonSizes.Large)]
+        [GUIColor(0.2f, 0.6f, 1f)]
+        private void CreateManualOutlineObject()
+        {
+            GameObject go = new GameObject("ManualOutlineDrawer");
+            ManualOutlineDrawer drawer = go.AddComponent<ManualOutlineDrawer>();
+            
+            if (SceneView.lastActiveSceneView != null)
+            {
+                Vector3 camPos = SceneView.lastActiveSceneView.camera.transform.position;
+                Vector3 camForward = SceneView.lastActiveSceneView.camera.transform.forward;
+                go.transform.position = camPos + camForward * 5f;
+            }
+            
+            SerializedObject so = new SerializedObject(drawer);
+            so.FindProperty("_lineColor").colorValue = _manualLineColor;
+            so.FindProperty("_pointColor").colorValue = _manualPointColor;
+            so.FindProperty("_pointSize").floatValue = _manualPointSize;
+            so.ApplyModifiedProperties();
+
+            Selection.activeGameObject = go;
+        }
+        
+        private void OnEnable()
+        {
+            if (EditorPrefs.HasKey(InsertKeyPrefsKey))
+                _insertKey = (KeyCode)EditorPrefs.GetInt(InsertKeyPrefsKey);
+        }
+
+        private void OnDisable()
+        {
+            EditorPrefs.SetInt(InsertKeyPrefsKey, (int)_insertKey);
+        }
+        
         private Mesh GenerateExtrudedMesh(List<Vector3> path, float height, float thickness)
         {
             List<Vector3> verts = new List<Vector3>();
