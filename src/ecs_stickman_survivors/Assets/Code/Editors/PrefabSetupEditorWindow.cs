@@ -10,7 +10,7 @@ namespace Code.Editors
 {
     public class PrefabSetupEditorWindow : OdinEditorWindow
     {
-        [MenuItem("Tools/Prefab Batch Editor")]
+        [MenuItem("Tools/Prefab Batch Editor Window")]
         private static void OpenWindow()
         {
             GetWindow<PrefabSetupEditorWindow>().Show();
