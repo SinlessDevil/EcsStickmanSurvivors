@@ -12,6 +12,7 @@ namespace Code.Editors.ColliderMeshCreator
     public class ColliderMeshEditorWindow : OdinEditorWindow
     {
         private const string InsertKeyPrefsKey = "ColliderMesh_InsertKey";
+        private const string DeleteKeyPrefsKey = "ColliderMesh_DeleteKey";
         
         [MenuItem("Tools/Collider Mesh Generator Editor Window")]
         private static void OpenWindow()
@@ -129,6 +130,11 @@ namespace Code.Editors.ColliderMeshCreator
         private KeyCode _insertKey = KeyCode.Q;
         
         [BoxGroup("Manual Outline")]
+        [LabelText("Delete Point Key")]
+        [SerializeField]
+        private KeyCode _deleteKey = KeyCode.E;
+        
+        [BoxGroup("Manual Outline")]
         [Button(ButtonSizes.Large)]
         [GUIColor(0.2f, 0.6f, 1f)]
         private void CreateManualOutlineObject()
@@ -152,15 +158,19 @@ namespace Code.Editors.ColliderMeshCreator
             Selection.activeGameObject = go;
         }
         
-        private void OnEnable()
+        protected override void OnEnable()
         {
             if (EditorPrefs.HasKey(InsertKeyPrefsKey))
                 _insertKey = (KeyCode)EditorPrefs.GetInt(InsertKeyPrefsKey);
+
+            if (EditorPrefs.HasKey(DeleteKeyPrefsKey))
+                _deleteKey = (KeyCode)EditorPrefs.GetInt(DeleteKeyPrefsKey);
         }
 
-        private void OnDisable()
+        protected override void OnDisable()
         {
             EditorPrefs.SetInt(InsertKeyPrefsKey, (int)_insertKey);
+            EditorPrefs.SetInt(DeleteKeyPrefsKey, (int)_deleteKey);
         }
         
         private Mesh GenerateExtrudedMesh(List<Vector3> path, float height, float thickness)
