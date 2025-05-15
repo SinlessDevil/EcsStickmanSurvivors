@@ -12,7 +12,7 @@ namespace Code.Editors
     public class ColliderMeshEditorWindow : OdinEditorWindow
     {
         private const float Epsilon = 0.001f;
-        
+
         [MenuItem("Tools/Collider Mesh Generator Editor Window")]
         private static void OpenWindow()
         {
@@ -25,9 +25,9 @@ namespace Code.Editors
         [SerializeField]
         private List<MeshFilter> _targetMeshFilters = new();
 
-        [FormerlySerializedAs("yOffset")] 
-        [BoxGroup("Collider Mesh Generation")] 
-        [LabelText("YOffset")] 
+        [FormerlySerializedAs("yOffset")]
+        [BoxGroup("Collider Mesh Generation")]
+        [LabelText("YOffset")]
         [SerializeField]
         private float _yOffset = 0.1f;
 
@@ -44,20 +44,20 @@ namespace Code.Editors
         private Material _debugMaterial;
 
         [BoxGroup("Collider Mesh Generation")]
-        [LabelText("Concavity (-1 to 1)")] 
-        [Range(-1f, 1f)] 
+        [LabelText("Concavity (-1 to 1)")]
+        [Range(-1f, 1f)]
         [SerializeField]
         private float _concavity = 0.5f;
 
-        [BoxGroup("Collider Mesh Generation")] 
-        [LabelText("Scale Factor")] 
-        [MinValue(0.01f)] 
+        [BoxGroup("Collider Mesh Generation")]
+        [LabelText("Scale Factor")]
+        [MinValue(0.01f)]
         [SerializeField]
         private float _scaleFactor = 1f;
 
-        [BoxGroup("Collider Mesh Generation")] 
-        [LabelText("Y Threshold")] 
-        [Range(0.001f, 15f)] 
+        [BoxGroup("Collider Mesh Generation")]
+        [LabelText("Y Threshold Percent (0 = top only, 1 = full range)")]
+        [Range(0f, 1f)]
         [SerializeField]
         private float _yThreshold = 0.05f;
 
@@ -77,8 +77,7 @@ namespace Code.Editors
                 Matrix4x4 matrix = targetMeshFilter.transform.localToWorldMatrix;
 
                 worldPoints.AddRange(sharedMesh.vertices
-                    .Select(v => matrix
-                    .MultiplyPoint3x4(v)));
+                    .Select(v => matrix.MultiplyPoint3x4(v)));
             }
 
             if (worldPoints.Count == 0)
@@ -89,9 +88,10 @@ namespace Code.Editors
 
             float minY = worldPoints.Min(p => p.y);
             float maxY = worldPoints.Max(p => p.y);
+            float thresholdY = Mathf.Lerp(maxY, minY, _yThreshold);
 
             List<Vector3> filteredPoints = worldPoints
-                .Where(p => Mathf.Abs(p.y - maxY) <= _yThreshold || Mathf.Abs(p.y - minY) <= _yThreshold)
+                .Where(p => p.y >= thresholdY)
                 .Select(p => new Vector3(p.x, 0, p.z))
                 .ToList();
 
@@ -133,9 +133,9 @@ namespace Code.Editors
 
             if (unorderedEdges == null || unorderedEdges.Count == 0)
                 return outline;
-            
+
             List<Line> edges = new List<Line>(unorderedEdges);
-            
+
             Line current = edges[0];
             edges.RemoveAt(0);
 
@@ -148,7 +148,7 @@ namespace Code.Editors
             while (edges.Count > 0)
             {
                 Vector2 last = new Vector2(outline[^1].x, outline[^1].z);
-                
+
                 int index = edges.FindIndex(e =>
                     Vector2.Distance(new Vector2((float)e.Nodes[0].X, (float)e.Nodes[0].Y), last) < Epsilon ||
                     Vector2.Distance(new Vector2((float)e.Nodes[1].X, (float)e.Nodes[1].Y), last) < Epsilon);
@@ -160,7 +160,7 @@ namespace Code.Editors
                 edges.RemoveAt(index);
 
                 Node nextNode = Vector2.Distance(new Vector2(
-                    (float)edge.Nodes[0].X, 
+                    (float)edge.Nodes[0].X,
                     (float)edge.Nodes[0].Y), last) < Epsilon
                     ? edge.Nodes[1]
                     : edge.Nodes[0];
@@ -170,7 +170,7 @@ namespace Code.Editors
 
             return outline;
         }
-        
+
         private Mesh GenerateExtrudedMesh(List<Vector3> path, float height, float thickness)
         {
             List<Vector3> verts = new List<Vector3>();
@@ -190,7 +190,7 @@ namespace Code.Editors
                 verts.Add(lowerB);
 
                 tris.AddRange(new[] { start + 2, start + 1, start + 0 });
-                tris.AddRange(new[] { start + 2, start + 3, start + 1 });;
+                tris.AddRange(new[] { start + 2, start + 3, start + 1 });
             }
 
             Mesh mesh = new Mesh();
