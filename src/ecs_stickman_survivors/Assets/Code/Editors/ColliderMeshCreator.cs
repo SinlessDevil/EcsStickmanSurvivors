@@ -23,17 +23,17 @@ namespace Code.Editors
         [SerializeField]
         private List<MeshFilter> _targetMeshFilters = new();
 
-        [FormerlySerializedAs("yOffset")] 
-        [BoxGroup("Collider Mesh Generation")] 
-        [LabelText("YOffset")] 
+        [FormerlySerializedAs("yOffset")]
+        [BoxGroup("Collider Mesh Generation")]
+        [LabelText("YOffset")]
         [SerializeField]
-        private float _yOffset = 0.1f;
+        private float _yOffset = 10f;
 
         [FormerlySerializedAs("extrusion")]
         [BoxGroup("Collider Mesh Generation")]
         [LabelText("Extrusion Thickness")]
         [SerializeField]
-        private float _extrusion = 1f;
+        private float _extrusion = 50f;
 
         [FormerlySerializedAs("debugMaterial")]
         [BoxGroup("Collider Mesh Generation")]
@@ -42,22 +42,22 @@ namespace Code.Editors
         private Material _debugMaterial;
 
         [BoxGroup("Collider Mesh Generation")]
-        [LabelText("Concavity (-1 to 1)")] 
-        [Range(-1f, 1f)] 
+        [LabelText("Concavity (-1 to 1)")]
+        [Range(-1f, 1f)]
         [SerializeField]
-        private float _concavity = 0.5f;
+        private float _concavity = 0f;
 
-        [BoxGroup("Collider Mesh Generation")] 
-        [LabelText("Scale Factor")] 
-        [MinValue(0.01f)] 
+        [BoxGroup("Collider Mesh Generation")]
+        [LabelText("Scale Factor")]
+        [MinValue(0.01f)]
         [SerializeField]
         private float _scaleFactor = 1f;
 
-        [BoxGroup("Collider Mesh Generation")] 
-        [LabelText("Y Threshold")] 
-        [Range(0.001f, 15f)] 
+        [BoxGroup("Collider Mesh Generation")]
+        [LabelText("Y Threshold Percent (0 = top only, 1 = full range)")]
+        [Range(0f, 1f)]
         [SerializeField]
-        private float _yThreshold = 0.05f;
+        private float _yThreshold = 0.7f;
 
         [BoxGroup("Collider Mesh Generation")]
         [Button(ButtonSizes.Large)]
@@ -75,8 +75,7 @@ namespace Code.Editors
                 var matrix = targetMeshFilter.transform.localToWorldMatrix;
 
                 worldPoints.AddRange(sharedMesh.vertices
-                    .Select(v => matrix
-                    .MultiplyPoint3x4(v)));
+                    .Select(v => matrix.MultiplyPoint3x4(v)));
             }
 
             if (worldPoints.Count == 0)
@@ -87,9 +86,11 @@ namespace Code.Editors
 
             float minY = worldPoints.Min(p => p.y);
             float maxY = worldPoints.Max(p => p.y);
+            float rangeY = maxY - minY;
+            float cutoffY = maxY - rangeY * _yThreshold;
 
             var filteredPoints = worldPoints
-                .Where(p => Mathf.Abs(p.y - maxY) <= _yThreshold || Mathf.Abs(p.y - minY) <= _yThreshold)
+                .Where(p => p.y >= cutoffY)
                 .Select(p => new Vector3(p.x, 0, p.z))
                 .ToList();
 
