@@ -13,7 +13,7 @@ Quickly assign materials and configure renderer options for prefabs or scene obj
 - ✅ Assign or randomize materials recursively  
 - 🎯 Match mesh names for targeted setup  
 - ⚙️ Configure shadow casting, GI, probes, motion vectors & more  
-👉 [View Release](https://github.com/your-repo-link/releases/tag/PrefabSetupEditor-v1.0.0)
+👉 [View Release](https://github.com/SinlessDevil/EcsStickmanSurvivors/releases/tag/PrefabSetupEditor-v1.0.0)
 
 ### 📦 ConcaveHull v1.0.0
 A lightweight plugin for generating concave hulls from 2D point clouds (XZ plane).  
