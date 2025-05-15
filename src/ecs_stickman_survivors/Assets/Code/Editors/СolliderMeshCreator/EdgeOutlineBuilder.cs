@@ -8,7 +8,7 @@ namespace Code.Editors.СolliderMeshCreator
     {
         private const float Epsilon = 0.001f;
 
-        public static List<Vector3> BuildOutline(List<Line> unorderedEdges)
+        public static List<Vector3> BuildOutline(this List<Line> unorderedEdges)
         {
             List<Vector3> outline = new List<Vector3>();
             if (unorderedEdges == null || unorderedEdges.Count == 0) return outline;
@@ -45,6 +45,33 @@ namespace Code.Editors.СolliderMeshCreator
             }
 
             return outline;
+        }
+        
+        public static List<Vector3> SmoothOutlineCatmullRom(this List<Vector3> points, int segmentsPerCurve = 5)
+        {
+            List<Vector3> result = new();
+
+            int count = points.Count;
+            for (int i = 0; i < count; i++)
+            {
+                Vector3 p0 = points[(i - 1 + count) % count];
+                Vector3 p1 = points[i];
+                Vector3 p2 = points[(i + 1) % count];
+                Vector3 p3 = points[(i + 2) % count];
+
+                for (int j = 0; j <= segmentsPerCurve; j++)
+                {
+                    float t = j / (float)segmentsPerCurve;
+                    Vector3 point = 0.5f * (
+                        2f * p1 +
+                        (p2 - p0) * t +
+                        (2f * p0 - 5f * p1 + 4f * p2 - p3) * t * t +
+                        (-p0 + 3f * p1 - 3f * p2 + p3) * t * t * t);
+                    result.Add(point);
+                }
+            }
+
+            return result;
         }
     }
 }

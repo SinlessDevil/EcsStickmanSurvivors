@@ -39,6 +39,8 @@ namespace Code.Editors.СolliderMeshCreator
         [SerializeField]
         private Material _debugMaterial;
 
+        [Space(10)]
+        
         [BoxGroup("Collider Mesh Generation")]
         [LabelText("Concavity (-1 to 1)")]
         [Range(-1f, 1f)]
@@ -56,7 +58,17 @@ namespace Code.Editors.СolliderMeshCreator
         [Range(0f, 1f)]
         [SerializeField]
         private float _yThreshold = 0.05f;
+        
+        [Space(10)]
+        
+        [BoxGroup("Collider Mesh Generation")]
+        [SerializeField, LabelText("Smooth Outline")]
+        private bool _smoothOutline = false;
 
+        [BoxGroup("Collider Mesh Generation")]
+        [SerializeField, ShowIf("_smoothOutline"), LabelText("Segments per Curve"), Range(1, 10)]
+        private int _smoothSegments = 4;
+        
         [BoxGroup("Collider Mesh Generation")]
         [Button(ButtonSizes.Large)]
         [GUIColor(0.3f, 0.9f, 0.4f)]
@@ -77,7 +89,9 @@ namespace Code.Editors.СolliderMeshCreator
             Hull.SetConvexHull(nodes);
             List<Line> edges = Hull.SetConcaveHull(_concavity, _scaleFactor);
 
-            List<Vector3> edgePoints = EdgeOutlineBuilder.BuildOutline(edges);
+            List<Vector3> edgePoints = edges.BuildOutline();
+            if (_smoothOutline)
+                edgePoints = edgePoints.SmoothOutlineCatmullRom(_smoothSegments);
             Mesh mesh = GenerateExtrudedMesh(edgePoints, _yOffset, _extrusion);
 
             GameObject container = new GameObject("Generated_Collider");
