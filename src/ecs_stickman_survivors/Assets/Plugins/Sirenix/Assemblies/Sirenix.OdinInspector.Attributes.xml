@@ -316,7 +316,7 @@
             public class MyComponent : MonoBehaviour
             {
             	[Button]
-            	private void DemoTestConcavity()
+            	private void Init()
             	{
             		// ...
             	}

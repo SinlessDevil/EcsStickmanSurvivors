@@ -7,7 +7,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-namespace Code.Editors.СolliderMeshCreator
+namespace Code.Editors.ColliderMeshCreator
 {
     public class ColliderMeshEditorWindow : OdinEditorWindow
     {

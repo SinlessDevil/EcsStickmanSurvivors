@@ -392,7 +392,7 @@
         </member>
         <member name="P:Sirenix.Serialization.BaseDataReaderWriter.NodesArray">
             <summary>
-            Gets the current Nodes array. The amount of Nodes contained in it is stored in the <see cref="P:Sirenix.Serialization.BaseDataReaderWriter.NodeDepth"/> property. The remainder of the array's length is buffer space.
+            Gets the current nodes array. The amount of nodes contained in it is stored in the <see cref="P:Sirenix.Serialization.BaseDataReaderWriter.NodeDepth"/> property. The remainder of the array's length is buffer space.
             </summary>
             <value>
             The current node array.
@@ -431,7 +431,7 @@
             </summary>
             <param name="name">The name of the node to pop.</param>
             <exception cref="T:System.InvalidOperationException">
-            There are no Nodes to pop.
+            There are no nodes to pop.
             or
             Tried to pop node with given name, but the current node's name was different.
             </exception>
@@ -2789,7 +2789,7 @@
         </member>
         <member name="F:Sirenix.Serialization.SerializationNode.Data">
             <summary>
-            The data contained in the node. Depending on the entry type and name, as well as Nodes encountered prior to this one, the format can vary wildly.
+            The data contained in the node. Depending on the entry type and name, as well as nodes encountered prior to this one, the format can vary wildly.
             </summary>
         </member>
         <member name="T:Sirenix.Serialization.SerializationNodeDataReader">
@@ -5246,7 +5246,7 @@
             <param name="a">The first <see cref="T:Sirenix.Serialization.NodeInfo"/>.</param>
             <param name="b">The second <see cref="T:Sirenix.Serialization.NodeInfo"/>.</param>
             <returns>
-            <c>true</c> if the Nodes were equal; otherwise, <c>false</c>.
+            <c>true</c> if the nodes were equal; otherwise, <c>false</c>.
             </returns>
         </member>
         <member name="M:Sirenix.Serialization.NodeInfo.op_Inequality(Sirenix.Serialization.NodeInfo,Sirenix.Serialization.NodeInfo)">
@@ -5256,7 +5256,7 @@
             <param name="a">The first <see cref="T:Sirenix.Serialization.NodeInfo"/>.</param>
             <param name="b">The second <see cref="T:Sirenix.Serialization.NodeInfo"/>.</param>
             <returns>
-            <c>true</c> if the Nodes were not equal; otherwise, <c>false</c>.
+            <c>true</c> if the nodes were not equal; otherwise, <c>false</c>.
             </returns>
         </member>
         <member name="M:Sirenix.Serialization.NodeInfo.Equals(System.Object)">

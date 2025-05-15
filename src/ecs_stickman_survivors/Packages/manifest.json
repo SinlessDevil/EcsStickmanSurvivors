@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "com.unity.mathematics": "1.2.6",
     "com.unity.feature.2d": "2.0.0",
     "com.unity.feature.characters-animation": "1.0.0",
     "com.unity.ide.rider": "3.0.28",

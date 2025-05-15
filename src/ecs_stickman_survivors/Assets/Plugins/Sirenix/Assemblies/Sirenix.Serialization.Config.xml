@@ -50,7 +50,7 @@
         </member>
         <member name="F:Sirenix.Serialization.DataFormat.Nodes">
             <summary>
-            A format that does not serialize to a byte stream, but to a list of data Nodes in memory
+            A format that does not serialize to a byte stream, but to a list of data nodes in memory
             which can then be serialized by Unity.
             <para />
             This format is highly inefficient, and is primarily used for ensuring that Unity assets

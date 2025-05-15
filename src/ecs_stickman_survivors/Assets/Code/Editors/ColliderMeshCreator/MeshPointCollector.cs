@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Code.Editors.СolliderMeshCreator
+namespace Code.Editors.ColliderMeshCreator
 {
     public static class MeshPointCollector
     {

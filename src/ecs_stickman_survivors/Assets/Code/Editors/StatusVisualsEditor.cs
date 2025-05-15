@@ -1,13 +1,13 @@
+using System;
+using System.Collections.Generic;
 using Code.Gameplay.Common.Visuals.StatusVisuals;
 using UnityEditor;
 using UnityEngine;
-using System;
-using System.Collections.Generic;
 
-namespace Code.Editor
+namespace Code.Editors
 {
     [CustomEditor(typeof(StatusVisuals))]
-    public class StatusVisualsEditor : UnityEditor.Editor
+    public class StatusVisualsEditor : Editor
     {
         private readonly Dictionary<string, bool> _effectStates = new();
 
