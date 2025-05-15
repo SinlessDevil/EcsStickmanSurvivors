@@ -21,7 +21,7 @@ Designed for procedural outlines, collision geometry, or gameplay zones.
 - 📘 API: `Hull.SetConvexHull(nodes)`, `Hull.SetConcaveHull(concavity, scaleFactor)`  
 - 🔄 Works with any arbitrary set of points  
 - ✅ Fully deterministic & self-contained  
-👉 [View Release](https://github.com/your-repo-link/releases/tag/ConcaveHull-v1.0.0)
+👉 [View Release]([https://github.com/your-repo-link/releases/tag/ConcaveHull-v1.0.0](https://github.com/SinlessDevil/EcsStickmanSurvivors/releases/tag/ConcaveHull-v1.0.0))
 
 
-📌 *Currently in early development. More coming soon...*
+# 📌 *Currently in early development. More coming soon...*
