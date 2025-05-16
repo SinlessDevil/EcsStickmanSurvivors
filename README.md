@@ -5,8 +5,6 @@ Built with Unity DOTS (ECS), it's focused on high performance, scalable spawning
 
 ![image](https://github.com/user-attachments/assets/2b94c339-45be-4d16-b060-d73a09878c5e)
 
-## ✅ Recently Released Tools
-
 ### 📦 PrefabSetupEditor v1.0.0
 Quickly assign materials and configure renderer options for prefabs or scene objects in bulk.
 - Assign or randomize materials recursively  
