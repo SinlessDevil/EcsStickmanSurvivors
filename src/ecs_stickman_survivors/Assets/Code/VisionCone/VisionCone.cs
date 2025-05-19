@@ -20,7 +20,13 @@ namespace Code.VisionCone
         private MeshFilter _meshFilter;
 
         private bool _isInitialized;
-
+        
+        private float _lastAngle;
+        private float _lastRange;
+        private int _lastPrecision;
+        private Vector3 _lastPosition;
+        private Quaternion _lastRotation;
+        
         private readonly List<Vector3> _vertices = new();
         private readonly List<int> _triangles = new();
         private readonly List<Vector3> _normals = new();
@@ -62,7 +68,11 @@ namespace Code.VisionCone
                 if (!_isInitialized)
                     OnEnable();
 
-                UpdateMainLevel(_meshFilter, _visionRange);
+                if (ParamsChanged())
+                {
+                    UpdateMainLevel(_meshFilter, _visionRange);
+                    CacheParams();
+                }
             }
         }
 
@@ -150,6 +160,22 @@ namespace Code.VisionCone
             m.SetTriangles(_triangles, 0);
             m.SetNormals(_normals);
             m.SetUVs(0, _uv);
+        }
+        
+        private bool ParamsChanged() =>
+            !Mathf.Approximately(_lastAngle, _visionAngle) ||
+            !Mathf.Approximately(_lastRange, _visionRange) ||
+            _lastPrecision != _precision ||
+            _lastPosition != transform.position ||
+            _lastRotation != transform.rotation;
+
+        private void CacheParams()
+        {
+            _lastAngle = _visionAngle;
+            _lastRange = _visionRange;
+            _lastPrecision = _precision;
+            _lastPosition = transform.position;
+            _lastRotation = transform.rotation;
         }
     }
 }
