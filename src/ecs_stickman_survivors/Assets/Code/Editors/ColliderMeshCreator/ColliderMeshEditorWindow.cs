@@ -20,26 +20,37 @@ namespace Code.Editors.ColliderMeshCreator
             GetWindow<ColliderMeshEditorWindow>().Show();
         }
 
+        
+        [BoxGroup("Mesh Generation Settings")]
+        [GUIColor(0.7f, 0.9f, 1f)]
+        [SerializeField, LabelText("YOffset")]
+        private float _yOffset = 0.1f;
+
+        [BoxGroup("Mesh Generation Settings")]
+        [GUIColor(0.7f, 0.9f, 1f)]
+        [SerializeField, LabelText("Extrusion Thickness")]
+        private float _extrusion = 1f;
+
+        [BoxGroup("Mesh Generation Settings")]
+        [GUIColor(0.7f, 0.9f, 1f)]
+        [SerializeField, LabelText("Debug Material")]
+        private Material _debugMaterial;
+
+        [BoxGroup("Mesh Generation Settings")]
+        [GUIColor(0.7f, 0.9f, 1f)]
+        [SerializeField, LabelText("Smooth Outline")]
+        private bool _smoothOutline = false;
+
+        [BoxGroup("Mesh Generation Settings")]
+        [GUIColor(0.7f, 0.9f, 1f)]
+        [SerializeField, ShowIf("_smoothOutline"), LabelText("Segments per Curve"), Range(1, 10)]
+        private int _smoothSegments = 4;
+        
         [FormerlySerializedAs("targetMeshFilters")]
         [BoxGroup("Collider Mesh Generation")]
         [LabelText("Target Mesh Filters")]
         [SerializeField]
         private List<MeshFilter> _targetMeshFilters = new();
-
-        [BoxGroup("Collider Mesh Generation")]
-        [LabelText("YOffset")]
-        [SerializeField]
-        private float _yOffset = 0.1f;
-
-        [BoxGroup("Collider Mesh Generation")]
-        [LabelText("Extrusion Thickness")]
-        [SerializeField]
-        private float _extrusion = 1f;
-
-        [BoxGroup("Collider Mesh Generation")]
-        [LabelText("Debug Material")]
-        [SerializeField]
-        private Material _debugMaterial;
 
         [Space(10)]
         
@@ -60,16 +71,6 @@ namespace Code.Editors.ColliderMeshCreator
         [Range(0f, 1f)]
         [SerializeField]
         private float _yThreshold = 0.05f;
-        
-        [Space(10)]
-        
-        [BoxGroup("Collider Mesh Generation")]
-        [SerializeField, LabelText("Smooth Outline")]
-        private bool _smoothOutline = false;
-
-        [BoxGroup("Collider Mesh Generation")]
-        [SerializeField, ShowIf("_smoothOutline"), LabelText("Segments per Curve"), Range(1, 10)]
-        private int _smoothSegments = 4;
         
         [BoxGroup("Collider Mesh Generation")]
         [Button(ButtonSizes.Large)]
@@ -109,6 +110,8 @@ namespace Code.Editors.ColliderMeshCreator
             Debug.Log("Collider mesh generated successfully.");
         }
         
+        //------------------- Manual Outline Drawer ------------------
+        
         [BoxGroup("Manual Outline")]
         [LabelText("Line Color")]
         [SerializeField]
@@ -136,6 +139,7 @@ namespace Code.Editors.ColliderMeshCreator
         
         [BoxGroup("Manual Outline")]
         [Button(ButtonSizes.Large)]
+        [PropertyOrder(0)]
         [GUIColor(0.2f, 0.6f, 1f)]
         private void CreateManualOutlineObject()
         {
@@ -156,6 +160,57 @@ namespace Code.Editors.ColliderMeshCreator
             so.ApplyModifiedProperties();
 
             Selection.activeGameObject = go;
+        }
+        
+        [BoxGroup("Manual Outline")]
+        [LabelText("Target Manual Outline Drawers")]
+        [PropertyOrder(1)]
+        [SerializeField]
+        private List<ManualOutlineDrawer> _targetsManualOutlineDrawers = new();
+
+        [BoxGroup("Manual Outline")]
+        [Button(ButtonSizes.Large)]
+        [PropertyOrder(2)]
+        [GUIColor(0.4f, 0.8f, 1f)]
+        private void GenerateColliderFromManualDrawers()
+        {
+            if (_targetsManualOutlineDrawers == null || _targetsManualOutlineDrawers.Count == 0)
+            {
+                Debug.LogWarning("No ManualOutlineDrawers assigned.");
+                return;
+            }
+
+            List<Vector3> allPoints = new();
+
+            foreach (var drawer in _targetsManualOutlineDrawers)
+            {
+                if (drawer == null || drawer.Points == null || drawer.Points.Count < 3)
+                    continue;
+
+                allPoints.AddRange(drawer.Points.Select(p => drawer.transform.TransformPoint(p)));
+            }
+
+            if (allPoints.Count < 3)
+            {
+                Debug.LogWarning("Not enough points to create mesh.");
+                return;
+            }
+
+            if (_smoothOutline)
+                allPoints = allPoints.SmoothOutlineCatmullRom(_smoothSegments);
+
+            Mesh mesh = GenerateExtrudedMesh(allPoints, _yOffset, _extrusion);
+
+            GameObject container = new GameObject("Manual_Collider");
+            container.transform.position = Vector3.zero;
+            container.transform.rotation = Quaternion.identity;
+
+            container.AddComponent<MeshFilter>().sharedMesh = mesh;
+            container.AddComponent<MeshRenderer>().sharedMaterial = _debugMaterial;
+            container.AddComponent<MeshCollider>().sharedMesh = mesh;
+            container.GetComponent<MeshCollider>().convex = false;
+
+            Debug.Log("Generated collider from manual points.");
         }
         
         protected override void OnEnable()

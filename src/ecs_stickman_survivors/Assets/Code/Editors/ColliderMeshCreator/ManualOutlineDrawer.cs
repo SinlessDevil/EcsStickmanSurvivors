@@ -8,8 +8,7 @@ namespace Code.Editors.ColliderMeshCreator
     [ExecuteAlways]
     public class ManualOutlineDrawer : MonoBehaviour
     {
-        [SerializeField]
-        private List<Vector3> _points = new();
+        [SerializeField] private List<Vector3> _points = new();
 
         [Space(10), Header("Gizmos Settings")]
         [SerializeField] private Color _lineColor = Color.green;
