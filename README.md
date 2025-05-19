@@ -20,7 +20,7 @@ Designed for procedural outlines, collision geometry, or gameplay zones.
 - Fully deterministic & self-contained  
 👉 [View Release](https://github.com/SinlessDevil/EcsStickmanSurvivors/releases/tag/ConcaveHull-v1.0.0)
 
-### 🧱 ColliderMeshCreator v1.0.0  
+### 📦 ColliderMeshCreator v1.0.0  
 A Unity Editor tool for generating extruded 3D collider meshes from selected MeshFilters or manually placed outline points.
 - Supports both auto and manual outline modes  
 - Extrudes custom 2D outlines into 3D walls  
