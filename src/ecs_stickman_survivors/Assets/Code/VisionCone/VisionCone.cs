@@ -57,10 +57,15 @@ namespace Code.VisionCone
             _meshRenderer.allowOcclusionWhenDynamic = false;
             _meshRenderer.sortingOrder = _sortOrder;
 
-            if (_meshFilter.sharedMesh == null)
+            if (_meshFilter.sharedMesh == null || _meshFilter.sharedMesh.name != "VisionCone")
+            {
                 _meshFilter.sharedMesh = new Mesh { name = "VisionCone" };
+                _meshFilter.sharedMesh.MarkDynamic();
+            }
 
             _isInitialized = true;
+            
+            RecalculateDirections();
         }
 
         private void Update()
@@ -70,7 +75,10 @@ namespace Code.VisionCone
                 if (!_isInitialized)
                     OnEnable();
 
-                if (ParamsChanged())
+                if (_meshFilter == null || _meshFilter.sharedMesh == null)
+                    return;
+
+                if (_precomputedDirs == null || ParamsChanged())
                 {
                     UpdateMainLevel(_meshFilter, _visionRange);
                     CacheParams();
@@ -120,6 +128,9 @@ namespace Code.VisionCone
 
         private void UpdateMainLevel(MeshFilter mesh, float range)
         {
+            if (_precomputedDirs == null || _precomputedDirs.Length == 0)
+                RecalculateDirections();
+            
             _vertices.Clear();
             _triangles.Clear();
             _normals.Clear();
