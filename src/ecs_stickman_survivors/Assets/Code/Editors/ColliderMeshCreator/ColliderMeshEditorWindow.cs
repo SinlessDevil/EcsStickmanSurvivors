@@ -13,147 +13,114 @@ namespace Code.Editors.ColliderMeshCreator
     {
         private const string InsertKeyPrefsKey = "ColliderMesh_InsertKey";
         private const string DeleteKeyPrefsKey = "ColliderMesh_DeleteKey";
-        
-        [MenuItem("Tools/Collider Mesh Generator Editor Window")]
-        private static void OpenWindow()
-        {
-            GetWindow<ColliderMeshEditorWindow>().Show();
-        }
 
-        
-        [BoxGroup("Mesh Generation Settings")]
-        [GUIColor(0.7f, 0.9f, 1f)]
+        private static readonly Color MainColor = new(0.7f, 0.9f, 1f);
+        private static readonly Color ButtonColor = new(0.3f, 0.9f, 0.4f);
+        private static readonly Color CreateColor = new(0.2f, 0.6f, 1f);
+        private static readonly Color ManualGenColor = new(0.4f, 0.8f, 1f);
+
+        [MenuItem("Tools/Collider Mesh Generator Editor Window")]
+        private static void OpenWindow() => GetWindow<ColliderMeshEditorWindow>().Show();
+
+        [BoxGroup("Mesh Generation Settings"), GUIColor("MainColor")]
         [SerializeField, LabelText("YOffset")]
         private float _yOffset = 0.1f;
 
-        [BoxGroup("Mesh Generation Settings")]
-        [GUIColor(0.7f, 0.9f, 1f)]
+        [BoxGroup("Mesh Generation Settings"), GUIColor("MainColor")]
         [SerializeField, LabelText("Extrusion Thickness")]
         private float _extrusion = 1f;
 
-        [BoxGroup("Mesh Generation Settings")]
-        [GUIColor(0.7f, 0.9f, 1f)]
+        [BoxGroup("Mesh Generation Settings"), GUIColor("MainColor")]
         [SerializeField, LabelText("Debug Material")]
         private Material _debugMaterial;
 
-        [BoxGroup("Mesh Generation Settings")]
-        [GUIColor(0.7f, 0.9f, 1f)]
+        [BoxGroup("Mesh Generation Settings"), GUIColor("MainColor")]
         [SerializeField, LabelText("Smooth Outline")]
         private bool _smoothOutline = false;
 
-        [BoxGroup("Mesh Generation Settings")]
-        [GUIColor(0.7f, 0.9f, 1f)]
+        [BoxGroup("Mesh Generation Settings"), GUIColor("MainColor")]
         [SerializeField, ShowIf("_smoothOutline"), LabelText("Segments per Curve"), Range(1, 10)]
         private int _smoothSegments = 4;
-        
+
         [FormerlySerializedAs("targetMeshFilters")]
         [BoxGroup("Collider Mesh Generation")]
-        [LabelText("Target Mesh Filters")]
-        [SerializeField]
+        [SerializeField, LabelText("Target Mesh Filters")]
         private List<MeshFilter> _targetMeshFilters = new();
 
-        [Space(10)]
-        
-        [BoxGroup("Collider Mesh Generation")]
-        [LabelText("Concavity (-1 to 1)")]
-        [Range(-1f, 1f)]
-        [SerializeField]
+        [BoxGroup("Collider Mesh Generation"), Space(10)]
+        [SerializeField, LabelText("Concavity (-1 to 1)"), Range(-1f, 1f)]
         private float _concavity = 0.5f;
 
         [BoxGroup("Collider Mesh Generation")]
-        [LabelText("Scale Factor")]
-        [MinValue(0.01f)]
-        [SerializeField]
+        [SerializeField, LabelText("Scale Factor"), MinValue(0.01f)]
         private float _scaleFactor = 1f;
 
         [BoxGroup("Collider Mesh Generation")]
-        [LabelText("Y Threshold Percent (0 = top only, 1 = full range)")]
-        [Range(0f, 1f)]
-        [SerializeField]
+        [SerializeField, LabelText("Y Threshold Percent (0 = top only, 1 = full range)"), Range(0f, 1f)]
         private float _yThreshold = 0.05f;
-        
-        [BoxGroup("Collider Mesh Generation")]
+
+        [BoxGroup("Collider Mesh Generation"), GUIColor("ButtonColor")]
         [Button(ButtonSizes.Large)]
-        [GUIColor(0.3f, 0.9f, 0.4f)]
         private void GenerateCollider()
         {
-            List<Vector3> worldPoints = MeshPointCollector.CollectWorldPoints(_targetMeshFilters);
-
+            var worldPoints = MeshPointCollector.CollectWorldPoints(_targetMeshFilters);
             if (worldPoints.Count == 0)
             {
                 Debug.LogError("No vertices found in the provided MeshFilters.");
                 return;
             }
 
-            List<Vector3> filteredPoints = YThresholdFilter.FilterTopPoints(worldPoints, _yThreshold);
-            List<Node> nodes = filteredPoints.Select((p, i) => new Node(p.x, p.z, i)).ToList();
+            var filteredPoints = YThresholdFilter.FilterTopPoints(worldPoints, _yThreshold);
+            var nodes = filteredPoints.Select((p, i) => new Node(p.x, p.z, i)).ToList();
 
             Hull.CleanUp();
             Hull.SetConvexHull(nodes);
-            List<Line> edges = Hull.SetConcaveHull(_concavity, _scaleFactor);
+            var edges = Hull.SetConcaveHull(_concavity, _scaleFactor);
 
-            List<Vector3> edgePoints = edges.BuildOutline();
+            var edgePoints = edges.BuildOutline();
             if (_smoothOutline)
                 edgePoints = edgePoints.SmoothOutlineCatmullRom(_smoothSegments);
-            Mesh mesh = GenerateExtrudedMesh(edgePoints, _yOffset, _extrusion);
 
-            GameObject container = new GameObject("Generated_Collider");
-            container.transform.SetParent(null);
-            container.transform.localPosition = Vector3.zero;
-            container.transform.localRotation = Quaternion.identity;
-
-            container.AddComponent<MeshFilter>().sharedMesh = mesh;
-            container.AddComponent<MeshRenderer>().sharedMaterial = _debugMaterial;
-            container.AddComponent<MeshCollider>().sharedMesh = mesh;
-            container.GetComponent<MeshCollider>().convex = false;
-
-            Debug.Log("Collider mesh generated successfully.");
+            var mesh = GenerateExtrudedMesh(edgePoints);
+            CreateColliderContainer("Generated_Collider", mesh);
         }
-        
-        //------------------- Manual Outline Drawer ------------------
-        
+
+        // ---------------- Manual Outline ----------------
+
         [BoxGroup("Manual Outline")]
-        [LabelText("Line Color")]
-        [SerializeField]
+        [SerializeField, LabelText("Line Color")]
         private Color _manualLineColor = Color.green;
 
         [BoxGroup("Manual Outline")]
-        [LabelText("Point Color")]
-        [SerializeField]
+        [SerializeField, LabelText("Point Color")]
         private Color _manualPointColor = Color.red;
 
         [BoxGroup("Manual Outline")]
-        [LabelText("Point Size")]
-        [SerializeField]
+        [SerializeField, LabelText("Point Size")]
         private float _manualPointSize = 0.2f;
-        
+
         [BoxGroup("Manual Outline")]
-        [LabelText("Insert Point Key")]
-        [SerializeField]
+        [SerializeField, LabelText("Insert Point Key")]
         private KeyCode _insertKey = KeyCode.Q;
-        
+
         [BoxGroup("Manual Outline")]
-        [LabelText("Delete Point Key")]
-        [SerializeField]
+        [SerializeField, LabelText("Delete Point Key")]
         private KeyCode _deleteKey = KeyCode.E;
-        
-        [BoxGroup("Manual Outline")]
+
+        [BoxGroup("Manual Outline"), PropertyOrder(0), GUIColor("CreateColor")]
         [Button(ButtonSizes.Large)]
-        [PropertyOrder(0)]
-        [GUIColor(0.2f, 0.6f, 1f)]
         private void CreateManualOutlineObject()
         {
-            GameObject go = new GameObject("ManualOutlineDrawer");
-            ManualOutlineDrawer drawer = go.AddComponent<ManualOutlineDrawer>();
-            
+            GameObject go = new("ManualOutlineDrawer");
+            var drawer = go.AddComponent<ManualOutlineDrawer>();
+
             if (SceneView.lastActiveSceneView != null)
             {
-                Vector3 camPos = SceneView.lastActiveSceneView.camera.transform.position;
-                Vector3 camForward = SceneView.lastActiveSceneView.camera.transform.forward;
-                go.transform.position = camPos + camForward * 5f;
+                var cam = SceneView.lastActiveSceneView.camera;
+                go.transform.position = cam.transform.position + cam.transform.forward * 5f;
             }
-            
-            SerializedObject so = new SerializedObject(drawer);
+
+            var so = new SerializedObject(drawer);
             so.FindProperty("_lineColor").colorValue = _manualLineColor;
             so.FindProperty("_pointColor").colorValue = _manualPointColor;
             so.FindProperty("_pointSize").floatValue = _manualPointSize;
@@ -161,84 +128,77 @@ namespace Code.Editors.ColliderMeshCreator
 
             Selection.activeGameObject = go;
         }
-        
-        [BoxGroup("Manual Outline")]
-        [LabelText("Target Manual Outline Drawers")]
-        [PropertyOrder(1)]
-        [SerializeField]
+
+        [BoxGroup("Manual Outline"), PropertyOrder(1)]
+        [SerializeField, LabelText("Target Manual Outline Drawers")]
         private List<ManualOutlineDrawer> _targetsManualOutlineDrawers = new();
 
-        [BoxGroup("Manual Outline")]
+        [BoxGroup("Manual Outline"), PropertyOrder(2), GUIColor("ManualGenColor")]
         [Button(ButtonSizes.Large)]
-        [PropertyOrder(2)]
-        [GUIColor(0.4f, 0.8f, 1f)]
         private void GenerateColliderFromManualDrawers()
         {
-            if (_targetsManualOutlineDrawers == null || _targetsManualOutlineDrawers.Count == 0)
-            {
-                Debug.LogWarning("No ManualOutlineDrawers assigned.");
-                return;
-            }
-
-            List<Vector3> allPoints = new();
-
-            foreach (var drawer in _targetsManualOutlineDrawers)
-            {
-                if (drawer == null || drawer.Points == null || drawer.Points.Count < 3)
-                    continue;
-
-                allPoints.AddRange(drawer.Points.Select(p => drawer.transform.TransformPoint(p)));
-            }
-
-            if (allPoints.Count < 3)
+            var points = CollectManualWorldPoints();
+            if (points.Count < 3)
             {
                 Debug.LogWarning("Not enough points to create mesh.");
                 return;
             }
 
             if (_smoothOutline)
-                allPoints = allPoints.SmoothOutlineCatmullRom(_smoothSegments);
+                points = points.SmoothOutlineCatmullRom(_smoothSegments);
 
-            Mesh mesh = GenerateExtrudedMesh(allPoints, _yOffset, _extrusion);
-
-            GameObject container = new GameObject("Manual_Collider");
-            container.transform.position = Vector3.zero;
-            container.transform.rotation = Quaternion.identity;
-
-            container.AddComponent<MeshFilter>().sharedMesh = mesh;
-            container.AddComponent<MeshRenderer>().sharedMaterial = _debugMaterial;
-            container.AddComponent<MeshCollider>().sharedMesh = mesh;
-            container.GetComponent<MeshCollider>().convex = false;
-
-            Debug.Log("Generated collider from manual points.");
+            var mesh = GenerateExtrudedMesh(points);
+            CreateColliderContainer("Manual_Collider", mesh);
         }
-        
-        protected override void OnEnable()
+
+        private List<Vector3> CollectManualWorldPoints()
+        {
+            return _targetsManualOutlineDrawers
+                .Where(d => d != null && d.Points != null && d.Points.Count >= 3)
+                .SelectMany(d => d.Points.Select(p => d.transform.TransformPoint(p)))
+                .ToList();
+        }
+
+        private void CreateColliderContainer(string name, Mesh mesh)
+        {
+            var go = new GameObject(name);
+            go.transform.position = Vector3.zero;
+            go.transform.rotation = Quaternion.identity;
+
+            go.AddComponent<MeshFilter>().sharedMesh = mesh;
+            go.AddComponent<MeshRenderer>().sharedMaterial = _debugMaterial;
+            go.AddComponent<MeshCollider>().sharedMesh = mesh;
+            go.GetComponent<MeshCollider>().convex = false;
+        }
+
+        protected override void OnEnable() => LoadPrefs();
+        protected override void OnDisable() => SavePrefs();
+
+        private void LoadPrefs()
         {
             if (EditorPrefs.HasKey(InsertKeyPrefsKey))
                 _insertKey = (KeyCode)EditorPrefs.GetInt(InsertKeyPrefsKey);
-
             if (EditorPrefs.HasKey(DeleteKeyPrefsKey))
                 _deleteKey = (KeyCode)EditorPrefs.GetInt(DeleteKeyPrefsKey);
         }
 
-        protected override void OnDisable()
+        private void SavePrefs()
         {
             EditorPrefs.SetInt(InsertKeyPrefsKey, (int)_insertKey);
             EditorPrefs.SetInt(DeleteKeyPrefsKey, (int)_deleteKey);
         }
-        
-        private Mesh GenerateExtrudedMesh(List<Vector3> path, float height, float thickness)
+
+        private Mesh GenerateExtrudedMesh(List<Vector3> path)
         {
-            List<Vector3> verts = new List<Vector3>();
-            List<int> tris = new List<int>();
+            List<Vector3> verts = new();
+            List<int> tris = new();
 
             for (int i = 0; i < path.Count; i++)
             {
-                Vector3 baseA = path[i] + Vector3.up * height;
-                Vector3 baseB = path[(i + 1) % path.Count] + Vector3.up * height;
-                Vector3 lowerA = baseA - Vector3.up * thickness;
-                Vector3 lowerB = baseB - Vector3.up * thickness;
+                Vector3 baseA = path[i] + Vector3.up * _yOffset;
+                Vector3 baseB = path[(i + 1) % path.Count] + Vector3.up * _yOffset;
+                Vector3 lowerA = baseA - Vector3.up * _extrusion;
+                Vector3 lowerB = baseB - Vector3.up * _extrusion;
 
                 int start = verts.Count;
                 verts.Add(baseA);
@@ -250,8 +210,7 @@ namespace Code.Editors.ColliderMeshCreator
                 tris.AddRange(new[] { start + 2, start + 3, start + 1 });
             }
 
-            Mesh mesh = new Mesh();
-            mesh.name = "ColliderMesh";
+            Mesh mesh = new() { name = "ColliderMesh" };
             mesh.SetVertices(verts);
             mesh.SetTriangles(tris, 0);
             mesh.RecalculateNormals();
