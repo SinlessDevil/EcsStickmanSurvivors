@@ -7,75 +7,73 @@ namespace Code.VisionCone
     public class VisionCone : MonoBehaviour
     {
         [Header("Vision")]
-        public float vision_angle = 30f;
-        public float vision_range = 5f;
-        public LayerMask obstacle_mask = ~0;
-
+        [SerializeField] private float _visionAngle = 360f;
+        [SerializeField] private float _visionRange = 1f;
+        [SerializeField] private LayerMask _obstacleMask = ~0;
         [Header("Material")]
-        public Material cone_material;
-        public int sort_order = 1;
-
+        [SerializeField] private Material _coneMaterial;
+        [SerializeField] private int _sortOrder = 1;
         [Header("Optimization")]
-        public int precision = 60;
+        [SerializeField] private int _precision = 300;
 
-        private MeshRenderer render;
-        private MeshFilter mesh;
+        private MeshRenderer _meshRenderer;
+        private MeshFilter _meshFilter;
 
-        private bool isInitialized;
+        private bool _isInitialized;
 
         private void OnEnable()
         {
-            if (isInitialized) 
+            if (_isInitialized) 
                 return;
 
-            render = GetComponent<MeshRenderer>();
-            if (render == null)
-                render = gameObject.AddComponent<MeshRenderer>();
+            _meshRenderer = GetComponent<MeshRenderer>();
+            if (_meshRenderer == null)
+                _meshRenderer = gameObject.AddComponent<MeshRenderer>();
 
-            mesh = GetComponent<MeshFilter>();
-            if (mesh == null)
-                mesh = gameObject.AddComponent<MeshFilter>();
+            _meshFilter = GetComponent<MeshFilter>();
+            if (_meshFilter == null)
+                _meshFilter = gameObject.AddComponent<MeshFilter>();
 
-            if (cone_material != null)
-                render.sharedMaterial = cone_material;
+            if (_coneMaterial != null)
+                _meshRenderer.sharedMaterial = _coneMaterial;
 
-            render.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-            render.receiveShadows = false;
-            render.lightProbeUsage = UnityEngine.Rendering.LightProbeUsage.Off;
-            render.reflectionProbeUsage = UnityEngine.Rendering.ReflectionProbeUsage.Off;
-            render.allowOcclusionWhenDynamic = false;
-            render.sortingOrder = sort_order;
+            _meshRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            _meshRenderer.receiveShadows = false;
+            _meshRenderer.lightProbeUsage = UnityEngine.Rendering.LightProbeUsage.Off;
+            _meshRenderer.reflectionProbeUsage = UnityEngine.Rendering.ReflectionProbeUsage.Off;
+            _meshRenderer.allowOcclusionWhenDynamic = false;
+            _meshRenderer.sortingOrder = _sortOrder;
 
-            if (mesh.sharedMesh == null)
-                mesh.sharedMesh = new Mesh { name = "VisionCone" };
+            if (_meshFilter.sharedMesh == null)
+                _meshFilter.sharedMesh = new Mesh { name = "VisionCone" };
 
-            isInitialized = true;
+            _isInitialized = true;
         }
 
         private void Update()
         {
             if (!Application.isPlaying)
             {
-                if (!isInitialized)
+                if (!_isInitialized)
                     OnEnable();
 
-                UpdateMainLevel(mesh, vision_range);
+                UpdateMainLevel(_meshFilter, _visionRange);
             }
         }
 
         private void OnValidate()
         {
-            if (!Application.isPlaying && mesh != null)
+            if (!Application.isPlaying && _meshFilter != null)
             {
-                UpdateMainLevel(mesh, vision_range);
+                UpdateMainLevel(_meshFilter, _visionRange);
             }
         }
 
         private void OnDrawGizmosSelected()
         {
             Vector3 origin = transform.position;
-            int minmax = Mathf.RoundToInt(vision_angle / 2f);
-            float step = Mathf.Clamp(vision_angle / precision, 0.01f, minmax);
+            int minmax = Mathf.RoundToInt(_visionAngle / 2f);
+            float step = Mathf.Clamp(_visionAngle / _precision, 0.01f, minmax);
 
             for (float i = -minmax; i <= minmax; i += step)
             {
@@ -83,7 +81,7 @@ namespace Code.VisionCone
                 Vector3 dirLocal = new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle));
                 Vector3 dirWorld = transform.TransformDirection(dirLocal);
 
-                if (Physics.Raycast(origin, dirWorld, out RaycastHit hit, vision_range, obstacle_mask.value))
+                if (Physics.Raycast(origin, dirWorld, out RaycastHit hit, _visionRange, _obstacleMask.value))
                 {
                     Gizmos.color = Color.red;
                     Gizmos.DrawLine(origin, origin + dirWorld * hit.distance);
@@ -91,7 +89,7 @@ namespace Code.VisionCone
                 else
                 {
                     Gizmos.color = Color.green;
-                    Gizmos.DrawLine(origin, origin + dirWorld * vision_range);
+                    Gizmos.DrawLine(origin, origin + dirWorld * _visionRange);
                 }
             }
         }
@@ -103,8 +101,8 @@ namespace Code.VisionCone
             List<Vector3> normals = new List<Vector3> { Vector3.up };
             List<Vector2> uv = new List<Vector2> { Vector2.zero };
 
-            int minmax = Mathf.RoundToInt(vision_angle / 2f);
-            float step = Mathf.Clamp(vision_angle / precision, 0.01f, minmax);
+            int minmax = Mathf.RoundToInt(_visionAngle / 2f);
+            float step = Mathf.Clamp(_visionAngle / _precision, 0.01f, minmax);
             int index = 1;
 
             for (float i = -minmax; i <= minmax; i += step)
@@ -114,7 +112,7 @@ namespace Code.VisionCone
 
                 Vector3 worldOrigin = transform.position;
                 Vector3 dirWorld = transform.TransformDirection(dir.normalized);
-                if (Physics.Raycast(worldOrigin, dirWorld, out RaycastHit hit, range, obstacle_mask.value))
+                if (Physics.Raycast(worldOrigin, dirWorld, out RaycastHit hit, range, _obstacleMask.value))
                 {
                     dir = dir.normalized * hit.distance;
                 }
