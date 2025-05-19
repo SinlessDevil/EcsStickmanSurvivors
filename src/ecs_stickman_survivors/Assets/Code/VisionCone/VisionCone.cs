@@ -21,6 +21,11 @@ namespace Code.VisionCone
 
         private bool _isInitialized;
 
+        private readonly List<Vector3> _vertices = new();
+        private readonly List<int> _triangles = new();
+        private readonly List<Vector3> _normals = new();
+        private readonly List<Vector2> _uv = new();
+        
         private void OnEnable()
         {
             if (_isInitialized) 
@@ -96,36 +101,44 @@ namespace Code.VisionCone
 
         private void UpdateMainLevel(MeshFilter mesh, float range)
         {
-            List<Vector3> vertices = new List<Vector3> { Vector3.zero };
-            List<int> triangles = new List<int>();
-            List<Vector3> normals = new List<Vector3> { Vector3.up };
-            List<Vector2> uv = new List<Vector2> { Vector2.zero };
+            _vertices.Clear();
+            _triangles.Clear();
+            _normals.Clear();
+            _uv.Clear();
+
+            _vertices.Add(Vector3.zero);
+            _normals.Add(Vector3.up);
+            _uv.Add(Vector2.zero);
 
             int minmax = Mathf.RoundToInt(_visionAngle / 2f);
             float step = Mathf.Clamp(_visionAngle / _precision, 0.01f, minmax);
             int index = 1;
+
+            Vector3 worldOrigin = transform.position;
+            Quaternion worldRotation = transform.rotation;
+            Quaternion inverseRotation = Quaternion.Inverse(worldRotation);
 
             for (float i = -minmax; i <= minmax; i += step)
             {
                 float angle = (i + 90f) * Mathf.Deg2Rad;
                 Vector3 dir = new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle)) * range;
 
-                Vector3 worldOrigin = transform.position;
-                Vector3 dirWorld = transform.TransformDirection(dir.normalized);
+                Vector3 dirWorld = worldRotation * dir.normalized;
                 if (Physics.Raycast(worldOrigin, dirWorld, out RaycastHit hit, range, _obstacleMask.value))
                 {
                     dir = dir.normalized * hit.distance;
                 }
 
-                vertices.Add(transform.InverseTransformDirection(dir));
-                normals.Add(Vector3.up);
-                uv.Add(Vector2.zero);
+                Vector3 localDir = inverseRotation * dir;
+                _vertices.Add(localDir);
+                _normals.Add(Vector3.up);
+                _uv.Add(Vector2.zero);
 
                 if (index > 1)
                 {
-                    triangles.Add(0);
-                    triangles.Add(index - 1);
-                    triangles.Add(index);
+                    _triangles.Add(0);
+                    _triangles.Add(index - 1);
+                    _triangles.Add(index);
                 }
 
                 index++;
@@ -133,10 +146,10 @@ namespace Code.VisionCone
 
             Mesh m = mesh.sharedMesh;
             m.Clear();
-            m.SetVertices(vertices);
-            m.SetTriangles(triangles, 0);
-            m.SetNormals(normals);
-            m.SetUVs(0, uv);
+            m.SetVertices(_vertices);
+            m.SetTriangles(_triangles, 0);
+            m.SetNormals(_normals);
+            m.SetUVs(0, _uv);
         }
     }
 }
