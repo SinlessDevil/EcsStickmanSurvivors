@@ -42,7 +42,11 @@ namespace Code.Editors.ColliderMeshCreator
         [SerializeField, ShowIf("_smoothOutline"), LabelText("Segments per Curve"), Range(1, 10)]
         private int _smoothSegments = 4;
 
-        [FormerlySerializedAs("targetMeshFilters")]
+        [BoxGroup("Mesh Generation Settings")]
+        [GUIColor(0.7f, 0.9f, 1f)]
+        [SerializeField, LabelText("Flip Face Direction")]
+        private bool _flipFaces = false;
+        
         [BoxGroup("Collider Mesh Generation")]
         [SerializeField, LabelText("Target Mesh Filters")]
         private List<MeshFilter> _targetMeshFilters = new();
@@ -206,8 +210,16 @@ namespace Code.Editors.ColliderMeshCreator
                 verts.Add(lowerA);
                 verts.Add(lowerB);
 
-                tris.AddRange(new[] { start + 2, start + 1, start + 0 });
-                tris.AddRange(new[] { start + 2, start + 3, start + 1 });
+                if (_flipFaces)
+                {
+                    tris.AddRange(new[] { start + 0, start + 1, start + 2 });
+                    tris.AddRange(new[] { start + 1, start + 3, start + 2 });
+                }
+                else
+                {
+                    tris.AddRange(new[] { start + 2, start + 1, start + 0 });
+                    tris.AddRange(new[] { start + 2, start + 3, start + 1 });
+                }
             }
 
             Mesh mesh = new() { name = "ColliderMesh" };
