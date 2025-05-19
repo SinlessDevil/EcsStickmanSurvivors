@@ -27,6 +27,8 @@ namespace Code.VisionCone
         private Vector3 _lastPosition;
         private Quaternion _lastRotation;
         
+        private Vector3[] _precomputedDirs;
+        
         private readonly List<Vector3> _vertices = new();
         private readonly List<int> _triangles = new();
         private readonly List<Vector3> _normals = new();
@@ -86,15 +88,21 @@ namespace Code.VisionCone
 
         private void OnDrawGizmosSelected()
         {
+#if UNITY_EDITOR
             Vector3 origin = transform.position;
+            Quaternion rotation = transform.rotation;
+
             int minmax = Mathf.RoundToInt(_visionAngle / 2f);
             float step = Mathf.Clamp(_visionAngle / _precision, 0.01f, minmax);
 
             for (float i = -minmax; i <= minmax; i += step)
             {
-                float angle = (i + 90f) * Mathf.Deg2Rad;
-                Vector3 dirLocal = new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle));
-                Vector3 dirWorld = transform.TransformDirection(dirLocal);
+                float angleRad = (i + 90f) * Mathf.Deg2Rad;
+                float cos = Mathf.Cos(angleRad);
+                float sin = Mathf.Sin(angleRad);
+
+                Vector3 dirLocal = new Vector3(cos, 0f, sin);
+                Vector3 dirWorld = rotation * dirLocal;
 
                 if (Physics.Raycast(origin, dirWorld, out RaycastHit hit, _visionRange, _obstacleMask.value))
                 {
@@ -107,6 +115,7 @@ namespace Code.VisionCone
                     Gizmos.DrawLine(origin, origin + dirWorld * _visionRange);
                 }
             }
+#endif
         }
 
         private void UpdateMainLevel(MeshFilter mesh, float range)
@@ -120,20 +129,17 @@ namespace Code.VisionCone
             _normals.Add(Vector3.up);
             _uv.Add(Vector2.zero);
 
-            int minmax = Mathf.RoundToInt(_visionAngle / 2f);
-            float step = Mathf.Clamp(_visionAngle / _precision, 0.01f, minmax);
-            int index = 1;
-
             Vector3 worldOrigin = transform.position;
             Quaternion worldRotation = transform.rotation;
             Quaternion inverseRotation = Quaternion.Inverse(worldRotation);
 
-            for (float i = -minmax; i <= minmax; i += step)
-            {
-                float angle = (i + 90f) * Mathf.Deg2Rad;
-                Vector3 dir = new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle)) * range;
+            int index = 1;
 
+            foreach (var dirLocal in _precomputedDirs)
+            {
+                Vector3 dir = dirLocal * range;
                 Vector3 dirWorld = worldRotation * dir.normalized;
+
                 if (Physics.Raycast(worldOrigin, dirWorld, out RaycastHit hit, range, _obstacleMask.value))
                 {
                     dir = dir.normalized * hit.distance;
@@ -176,6 +182,23 @@ namespace Code.VisionCone
             _lastPrecision = _precision;
             _lastPosition = transform.position;
             _lastRotation = transform.rotation;
+
+            RecalculateDirections();
+        }
+        
+        private void RecalculateDirections()
+        {
+            int minmax = Mathf.RoundToInt(_visionAngle / 2f);
+            float step = Mathf.Clamp(_visionAngle / _precision, 0.01f, minmax);
+
+            List<Vector3> dirs = new();
+            for (float i = -minmax; i <= minmax; i += step)
+            {
+                float angle = (i + 90f) * Mathf.Deg2Rad;
+                dirs.Add(new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle)));
+            }
+
+            _precomputedDirs = dirs.ToArray();
         }
     }
 }
