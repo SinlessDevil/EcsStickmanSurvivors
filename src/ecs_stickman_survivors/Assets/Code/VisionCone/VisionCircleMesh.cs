@@ -24,36 +24,44 @@ namespace Code.VisionCone
 
             _vertices.Add(Vector3.zero);
             _normals.Add(Vector3.up);
-            _uv.Add(Vector2.zero);
+            _uv.Add(new Vector2(0.5f, 0.5f));
 
-            Vector3 worldOrigin = transform.position;
-            Quaternion worldRotation = transform.rotation;
-            Quaternion inverseRotation = Quaternion.Inverse(worldRotation);
+            Vector3 origin = transform.position;
+            Quaternion rotation = transform.rotation;
+            Quaternion inverse = Quaternion.Inverse(rotation);
 
-            int index = 1;
-
-            foreach (var dirLocal in _precomputedDirs)
+            for (int i = 0; i < _precomputedDirs.Length; i++)
             {
-                Vector3 dir = dirLocal * _visionRange;
-                Vector3 dirWorld = worldRotation * dir.normalized;
+                Vector3 localDir = _precomputedDirs[i].normalized;
+                Vector3 worldDir = rotation * localDir;
+                float distance = _visionRange;
 
-                if (Physics.Raycast(worldOrigin, dirWorld, out RaycastHit hit, _visionRange, _obstacleMask.value))
-                    dir = dir.normalized * hit.distance;
-
-                Vector3 localDir = inverseRotation * dir;
-                _vertices.Add(localDir);
-                _normals.Add(Vector3.up);
-                _uv.Add(Vector2.zero);
-
-                if (index > 1)
+                if (Physics.Raycast(origin, worldDir, out RaycastHit hit, _visionRange, _obstacleMask))
                 {
-                    _triangles.Add(0);
-                    _triangles.Add(index - 1);
-                    _triangles.Add(index);
+                    distance = hit.distance;
                 }
 
-                index++;
+                Vector3 worldPoint = origin + worldDir * distance;
+                Vector3 localPoint = inverse * (worldPoint - origin);
+
+                _vertices.Add(localPoint);
+                _normals.Add(Vector3.up);
+                
+                Vector2 uv = new Vector2(localPoint.x / (_visionRange * 2f) + 0.5f,
+                    localPoint.z / (_visionRange * 2f) + 0.5f);
+                _uv.Add(uv);
             }
+            
+            for (int i = 1; i < _vertices.Count - 1; i++)
+            {
+                _triangles.Add(0);
+                _triangles.Add(i);
+                _triangles.Add(i + 1);
+            }
+            
+            _triangles.Add(0);
+            _triangles.Add(_vertices.Count - 1);
+            _triangles.Add(1);
 
             Mesh mesh = _meshFilter.sharedMesh;
             mesh.Clear();
@@ -63,14 +71,12 @@ namespace Code.VisionCone
             mesh.SetUVs(0, _uv);
         }
 
-        protected override bool ParamsChanged()
-        {
-            return !Mathf.Approximately(_lastAngle, _visionAngle) ||
-                   !Mathf.Approximately(_lastRange, _visionRange) ||
-                   _lastPrecision != _precision ||
-                   base.ParamsChanged();
-        }
-        
+        protected override bool ParamsChanged() =>
+            !Mathf.Approximately(_lastAngle, _visionAngle) ||
+            !Mathf.Approximately(_lastRange, _visionRange) ||
+            _lastPrecision != _precision ||
+            base.ParamsChanged();
+
         protected override void CacheParams()
         {
             _lastAngle = _visionAngle;
