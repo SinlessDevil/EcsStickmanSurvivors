@@ -39,8 +39,19 @@ namespace Code.VisionCone
             if (_isInitialized)
                 return;
 
-            _meshRenderer = GetComponent<MeshRenderer>() ?? gameObject.AddComponent<MeshRenderer>();
-            _meshFilter = GetComponent<MeshFilter>() ?? gameObject.AddComponent<MeshFilter>();
+            _meshRenderer = GetComponent<MeshRenderer>();
+            if (_meshRenderer == null)
+            {
+                _meshRenderer = gameObject.AddComponent<MeshRenderer>();
+                return;
+            }
+
+            _meshFilter = GetComponent<MeshFilter>();
+            if (_meshFilter == null)
+            {
+                _meshFilter = gameObject.AddComponent<MeshFilter>();
+                return;
+            }
 
             if (_coneMaterial != null)
                 _meshRenderer.sharedMaterial = _coneMaterial;

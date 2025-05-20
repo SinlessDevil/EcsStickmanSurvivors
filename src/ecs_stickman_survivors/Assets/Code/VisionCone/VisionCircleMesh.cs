@@ -55,12 +55,12 @@ namespace Code.VisionCone
                 index++;
             }
 
-            Mesh m = _meshFilter.sharedMesh;
-            m.Clear();
-            m.SetVertices(_vertices);
-            m.SetTriangles(_triangles, 0);
-            m.SetNormals(_normals);
-            m.SetUVs(0, _uv);
+            Mesh mesh = _meshFilter.sharedMesh;
+            mesh.Clear();
+            mesh.SetVertices(_vertices);
+            mesh.SetTriangles(_triangles, 0);
+            mesh.SetNormals(_normals);
+            mesh.SetUVs(0, _uv);
         }
 
         protected override bool ParamsChanged()
