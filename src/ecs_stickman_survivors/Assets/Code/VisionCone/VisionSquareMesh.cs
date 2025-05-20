@@ -50,17 +50,18 @@ namespace Code.VisionCone
                 _uv.Add(new Vector2(t, 1f));
             }
 
+            // 🔁 Инвертируем порядок треугольников
             for (int i = 1; i < _vertices.Count - 1; i++)
             {
                 _triangles.Add(0);
-                _triangles.Add(i);
                 _triangles.Add(i + 1);
+                _triangles.Add(i);
             }
 
-            // последний треугольник
+            // Замыкающий треугольник
             _triangles.Add(0);
-            _triangles.Add(_vertices.Count - 1);
             _triangles.Add(1);
+            _triangles.Add(_vertices.Count - 1);
 
             Mesh mesh = _meshFilter.sharedMesh;
             mesh.Clear();
@@ -69,26 +70,27 @@ namespace Code.VisionCone
             mesh.SetNormals(_normals);
             mesh.SetUVs(0, _uv);
         }
-
+        
         private Vector3 GetPointOnRectangleEdge(float t)
         {
             float halfW = _width / 2f;
             float halfH = _height / 2f;
+
             float total = t * 4f;
 
-            if (total < 1f) // Bottom
-                return new Vector3(Mathf.Lerp(-halfW, halfW, total), 0, -halfH);
-            else if (total < 2f) // Right
-                return new Vector3(halfW, 0, Mathf.Lerp(-halfH, halfH, total - 1f));
-            else if (total < 3f) // Top
-                return new Vector3(Mathf.Lerp(halfW, -halfW, total - 2f), 0, halfH);
-            else // Left
-                return new Vector3(-halfW, 0, Mathf.Lerp(halfH, -halfH, total - 3f));
+            return total switch
+            {
+                < 1f => new Vector3(Mathf.Lerp(-halfW, halfW, total), 0, -halfH),
+                < 2f => new Vector3(halfW, 0, Mathf.Lerp(-halfH, halfH, total - 1f)),
+                _ => total < 3f
+                    ? new Vector3(Mathf.Lerp(halfW, -halfW, total - 2f), 0, halfH)
+                    : new Vector3(-halfW, 0, Mathf.Lerp(halfH, -halfH, total - 3f))
+            };
         }
 
+#if UNITY_EDITOR
         private void OnDrawGizmosSelected()
         {
-#if UNITY_EDITOR
             Vector3 origin = transform.position;
             Quaternion rotation = transform.rotation;
 
@@ -97,8 +99,9 @@ namespace Code.VisionCone
                 float t = i / (float)_segments;
                 Vector3 edgeLocal = GetPointOnRectangleEdge(t);
                 Vector3 edgeWorld = transform.TransformPoint(edgeLocal);
-                Vector3 dir = (edgeWorld - origin).normalized;
-                float dist = (edgeWorld - origin).magnitude;
+                Vector3 dir = edgeWorld - origin;
+                float dist = dir.magnitude;
+                dir.Normalize();
 
                 if (Physics.Raycast(origin, dir, out RaycastHit hit, dist, _obstacleMask))
                 {
@@ -112,8 +115,8 @@ namespace Code.VisionCone
                     Gizmos.DrawLine(origin, edgeWorld);
                 }
             }
-#endif
         }
+#endif
 
         protected override bool ParamsChanged()
         {
