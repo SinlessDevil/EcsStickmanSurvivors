@@ -4,17 +4,14 @@ namespace Code.VisionCone
 {
     public class VisionSquareMesh : BaseVisionMesh
     {
-        [Header("Square Settings")] [SerializeField]
-        private float _width = 2f;
-
+        [Header("Square Settings")]
+        [SerializeField] private float _width = 2f;
         [SerializeField] private float _height = 2f;
-        [SerializeField] private int _segmentsX = 10;
-        [SerializeField] private int _segmentsY = 10;
+        [SerializeField] private int _segments = 64;
 
         private float _lastWidth;
         private float _lastHeight;
-        private int _lastSegmentsX;
-        private int _lastSegmentsY;
+        private int _lastSegments;
 
         protected override string MeshName => "VisionSquareMesh";
 
@@ -27,48 +24,43 @@ namespace Code.VisionCone
 
             Vector3 origin = transform.position;
             Quaternion rotation = transform.rotation;
-            Quaternion inverseRotation = Quaternion.Inverse(rotation);
+            Quaternion inverse = Quaternion.Inverse(rotation);
 
-            for (int y = 0; y <= _segmentsY; y++)
+            _vertices.Add(Vector3.zero); // Центр
+            _normals.Add(Vector3.up);
+            _uv.Add(Vector2.zero);
+
+            for (int i = 0; i < _segments; i++)
             {
-                float localY = -_height / 2f + _height * y / _segmentsY;
+                float t = i / (float)_segments;
+                Vector3 edgeLocal = GetPointOnRectangleEdge(t);
+                Vector3 edgeWorld = transform.TransformPoint(edgeLocal);
 
-                for (int x = 0; x <= _segmentsX; x++)
+                Vector3 dir = (edgeWorld - origin).normalized;
+                float dist = (edgeWorld - origin).magnitude;
+
+                if (Physics.Raycast(origin, dir, out RaycastHit hit, dist, _obstacleMask))
                 {
-                    float localX = -_width / 2f + _width * x / _segmentsX;
-
-                    Vector3 localPoint = new Vector3(localX, 0f, localY);
-                    Vector3 worldPoint = origin + rotation * localPoint;
-                    Vector3 dir = (worldPoint - origin).normalized;
-                    float maxDist = localPoint.magnitude;
-
-                    if (Physics.Raycast(origin, dir, out RaycastHit hit, maxDist, _obstacleMask))
-                    {
-                        localPoint = inverseRotation * (hit.point - origin);
-                    }
-
-                    _vertices.Add(localPoint);
-                    _normals.Add(Vector3.up);
-                    _uv.Add(new Vector2((float)x / _segmentsX, (float)y / _segmentsY));
+                    edgeWorld = hit.point;
                 }
+
+                Vector3 localPoint = inverse * (edgeWorld - origin);
+                _vertices.Add(localPoint);
+                _normals.Add(Vector3.up);
+                _uv.Add(new Vector2(t, 1f));
             }
 
-            int vertexCountX = _segmentsX + 1;
-            for (int y = 0; y < _segmentsY; y++)
+            for (int i = 1; i < _vertices.Count - 1; i++)
             {
-                for (int x = 0; x < _segmentsX; x++)
-                {
-                    int i = x + y * vertexCountX;
-
-                    _triangles.Add(i);
-                    _triangles.Add(i + vertexCountX);
-                    _triangles.Add(i + 1);
-
-                    _triangles.Add(i + 1);
-                    _triangles.Add(i + vertexCountX);
-                    _triangles.Add(i + vertexCountX + 1);
-                }
+                _triangles.Add(0);
+                _triangles.Add(i);
+                _triangles.Add(i + 1);
             }
+
+            // последний треугольник
+            _triangles.Add(0);
+            _triangles.Add(_vertices.Count - 1);
+            _triangles.Add(1);
 
             Mesh mesh = _meshFilter.sharedMesh;
             mesh.Clear();
@@ -78,24 +70,20 @@ namespace Code.VisionCone
             mesh.SetUVs(0, _uv);
         }
 
-
-        protected override bool ParamsChanged()
+        private Vector3 GetPointOnRectangleEdge(float t)
         {
-            return
-                _lastWidth != _width ||
-                _lastHeight != _height ||
-                _lastSegmentsX != _segmentsX ||
-                _lastSegmentsY != _segmentsY ||
-                base.ParamsChanged();
-        }
+            float halfW = _width / 2f;
+            float halfH = _height / 2f;
+            float total = t * 4f;
 
-        protected override void CacheParams()
-        {
-            _lastWidth = _width;
-            _lastHeight = _height;
-            _lastSegmentsX = _segmentsX;
-            _lastSegmentsY = _segmentsY;
-            base.CacheParams();
+            if (total < 1f) // Bottom
+                return new Vector3(Mathf.Lerp(-halfW, halfW, total), 0, -halfH);
+            else if (total < 2f) // Right
+                return new Vector3(halfW, 0, Mathf.Lerp(-halfH, halfH, total - 1f));
+            else if (total < 3f) // Top
+                return new Vector3(Mathf.Lerp(halfW, -halfW, total - 2f), 0, halfH);
+            else // Left
+                return new Vector3(-halfW, 0, Mathf.Lerp(halfH, -halfH, total - 3f));
         }
 
         private void OnDrawGizmosSelected()
@@ -104,33 +92,44 @@ namespace Code.VisionCone
             Vector3 origin = transform.position;
             Quaternion rotation = transform.rotation;
 
-            for (int y = 0; y <= _segmentsY; y++)
+            for (int i = 0; i < _segments; i++)
             {
-                float localY = -_height / 2f + _height * y / _segmentsY;
+                float t = i / (float)_segments;
+                Vector3 edgeLocal = GetPointOnRectangleEdge(t);
+                Vector3 edgeWorld = transform.TransformPoint(edgeLocal);
+                Vector3 dir = (edgeWorld - origin).normalized;
+                float dist = (edgeWorld - origin).magnitude;
 
-                for (int x = 0; x <= _segmentsX; x++)
+                if (Physics.Raycast(origin, dir, out RaycastHit hit, dist, _obstacleMask))
                 {
-                    float localX = -_width / 2f + _width * x / _segmentsX;
-
-                    Vector3 localPoint = new Vector3(localX, 0f, localY);
-                    Vector3 worldPoint = origin + rotation * localPoint;
-                    Vector3 dir = (worldPoint - origin).normalized;
-                    float maxDist = localPoint.magnitude;
-
-                    if (Physics.Raycast(origin, dir, out RaycastHit hit, maxDist, _obstacleMask))
-                    {
-                        Gizmos.color = Color.red;
-                        Gizmos.DrawLine(origin, hit.point);
-                        Gizmos.DrawSphere(hit.point, 0.025f);
-                    }
-                    else
-                    {
-                        Gizmos.color = Color.green;
-                        Gizmos.DrawLine(origin, worldPoint);
-                    }
+                    Gizmos.color = Color.red;
+                    Gizmos.DrawLine(origin, hit.point);
+                    Gizmos.DrawSphere(hit.point, 0.025f);
+                }
+                else
+                {
+                    Gizmos.color = Color.green;
+                    Gizmos.DrawLine(origin, edgeWorld);
                 }
             }
 #endif
+        }
+
+        protected override bool ParamsChanged()
+        {
+            return
+                _lastWidth != _width ||
+                _lastHeight != _height ||
+                _lastSegments != _segments ||
+                base.ParamsChanged();
+        }
+
+        protected override void CacheParams()
+        {
+            _lastWidth = _width;
+            _lastHeight = _height;
+            _lastSegments = _segments;
+            base.CacheParams();
         }
     }
 }
