@@ -7,8 +7,6 @@ namespace Code.VisionCone
     public abstract class BaseVisionMesh : MonoBehaviour, IVisionMeshGenerator
     {
         [Header("Vision")]
-        [SerializeField] protected float _visionAngle = 360f;
-        [SerializeField] protected float _visionRange = 1f;
         [SerializeField] protected LayerMask _obstacleMask = ~0;
 
         [Header("Material")]
@@ -89,18 +87,12 @@ namespace Code.VisionCone
             }
         }
 
-        protected bool ParamsChanged() =>
-            !Mathf.Approximately(_lastAngle, _visionAngle) ||
-            !Mathf.Approximately(_lastRange, _visionRange) ||
-            _lastPrecision != _precision ||
+        protected virtual bool ParamsChanged() =>
             _lastPosition != transform.position ||
             _lastRotation != transform.rotation;
 
-        protected void CacheParams()
+        protected virtual void CacheParams()
         {
-            _lastAngle = _visionAngle;
-            _lastRange = _visionRange;
-            _lastPrecision = _precision;
             _lastPosition = transform.position;
             _lastRotation = transform.rotation;
         }

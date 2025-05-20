@@ -5,6 +5,9 @@ namespace Code.VisionCone
 {
     public class VisionCircleMesh : BaseVisionMesh
     {
+        [SerializeField] protected float _visionAngle = 360f;
+        [SerializeField] protected float _visionRange = 1f;
+        
         private Vector3[] _precomputedDirs;
 
         protected override string MeshName => "VisionCircleMesh";
@@ -60,6 +63,22 @@ namespace Code.VisionCone
             m.SetUVs(0, _uv);
         }
 
+        protected override bool ParamsChanged()
+        {
+            return !Mathf.Approximately(_lastAngle, _visionAngle) ||
+                   !Mathf.Approximately(_lastRange, _visionRange) ||
+                   _lastPrecision != _precision ||
+                   base.ParamsChanged();
+        }
+        
+        protected override void CacheParams()
+        {
+            _lastAngle = _visionAngle;
+            _lastRange = _visionRange;
+            _lastPrecision = _precision;
+            base.CacheParams();
+        }
+        
         private void RecalculateDirections()
         {
             int minmax = Mathf.RoundToInt(_visionAngle / 2f);
@@ -73,6 +92,38 @@ namespace Code.VisionCone
             }
 
             _precomputedDirs = dirs.ToArray();
+        }
+        
+        private void OnDrawGizmosSelected()
+        {
+#if UNITY_EDITOR
+            Vector3 origin = transform.position;
+            Quaternion rotation = transform.rotation;
+
+            int minmax = Mathf.RoundToInt(_visionAngle / 2f);
+            float step = Mathf.Clamp(_visionAngle / _precision, 0.01f, minmax);
+
+            for (float i = -minmax; i <= minmax; i += step)
+            {
+                float angleRad = (i + 90f) * Mathf.Deg2Rad;
+                float cos = Mathf.Cos(angleRad);
+                float sin = Mathf.Sin(angleRad);
+
+                Vector3 dirLocal = new Vector3(cos, 0f, sin);
+                Vector3 dirWorld = rotation * dirLocal;
+
+                if (Physics.Raycast(origin, dirWorld, out RaycastHit hit, _visionRange, _obstacleMask.value))
+                {
+                    Gizmos.color = Color.red;
+                    Gizmos.DrawLine(origin, origin + dirWorld * hit.distance);
+                }
+                else
+                {
+                    Gizmos.color = Color.green;
+                    Gizmos.DrawLine(origin, origin + dirWorld * _visionRange);
+                }
+            }
+#endif
         }
     }
 }
