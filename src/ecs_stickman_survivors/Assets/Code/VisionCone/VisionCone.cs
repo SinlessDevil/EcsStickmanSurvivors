@@ -70,20 +70,20 @@ namespace Code.VisionCone
 
         private void Update()
         {
-            if (!Application.isPlaying)
-            {
-                if (!_isInitialized)
-                    OnEnable();
+            if (Application.isPlaying) 
+                return;
+            
+            if (!_isInitialized)
+                OnEnable();
 
-                if (_meshFilter == null || _meshFilter.sharedMesh == null)
-                    return;
+            if (_meshFilter == null || _meshFilter.sharedMesh == null)
+                return;
 
-                if (_precomputedDirs == null || ParamsChanged())
-                {
-                    UpdateMainLevel(_meshFilter, _visionRange);
-                    CacheParams();
-                }
-            }
+            if (_precomputedDirs != null && !ParamsChanged()) 
+                return;
+            
+            UpdateMainLevel(_meshFilter, _visionRange);
+            CacheParams();
         }
 
         private void OnValidate()
