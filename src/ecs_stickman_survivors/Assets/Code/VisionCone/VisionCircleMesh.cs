@@ -46,7 +46,7 @@ namespace Code.VisionCone
 
                 _vertices.Add(localPoint);
                 _normals.Add(Vector3.up);
-                
+
                 Vector2 uv = new Vector2(localPoint.x / (_visionRange * 2f) + 0.5f,
                     localPoint.z / (_visionRange * 2f) + 0.5f);
                 _uv.Add(uv);
@@ -55,13 +55,13 @@ namespace Code.VisionCone
             for (int i = 1; i < _vertices.Count - 1; i++)
             {
                 _triangles.Add(0);
-                _triangles.Add(i);
                 _triangles.Add(i + 1);
+                _triangles.Add(i);
             }
             
             _triangles.Add(0);
-            _triangles.Add(_vertices.Count - 1);
             _triangles.Add(1);
+            _triangles.Add(_vertices.Count - 1);
 
             Mesh mesh = _meshFilter.sharedMesh;
             mesh.Clear();
