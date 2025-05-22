@@ -9,7 +9,6 @@ namespace Code.VisionCone
         [SerializeField, Range(4, 256)] private int _segments = 64;
 
         private float _lastSideLength;
-        private float _lastAngle;
         private int _lastSegments;
 
         protected override string MeshName => "VisionRhombusMesh";
