@@ -9,9 +9,9 @@ namespace Code.VisionCone
         [SerializeField] private float _height = 4f;
         [SerializeField] private int _segments = 64;
         [Header("Center Offset (local)")]
-        [SerializeField] private Vector3 _centerOffset = new Vector3(0f, 0f, -2f);
-        [SerializeField] private float _falloffPower = 0.25f;
-        [SerializeField] private float _falloffCenterBias = 0.5f;
+        [SerializeField] private Vector3 _centerOffset = new(0f, 0f, -2f);
+        [SerializeField] private float _preLength = 1.5f;
+        [SerializeField] private float _length = 2f;
         
         private float _lastWidth;
         private float _lastHeight;
@@ -31,36 +31,36 @@ namespace Code.VisionCone
             _normals.Add(Vector3.up);
             _uv.Add(Vector2.zero);
 
+            Vector3 origin = transform.position + transform.rotation * _centerOffset;
+            Quaternion inverseRotation = Quaternion.Inverse(transform.rotation);
+
             for (int i = 0; i <= _segments; i++)
             {
                 float t = i / (float)_segments;
                 float localX = Mathf.Lerp(-_width / 2f, _width / 2f, t);
-
-                float factor = 1f - Mathf.Abs(t - _falloffCenterBias) * _falloffPower;
-                float localZ = Mathf.Lerp(0f, _height, factor);
+                
+                float centerOffset = Mathf.Abs(t - 0.5f) * _length;
+                centerOffset = Mathf.Clamp01(centerOffset);
+                float curve = Mathf.Sin((1f - centerOffset) * Mathf.PI * 0.5f);
+                float localZ = _preLength + _height * curve;
 
                 Vector3 localPoint = new Vector3(localX, 0f, localZ);
-                Vector3 dir = transform.rotation * (localPoint - _centerOffset).normalized;
+                Vector3 worldPoint = transform.TransformPoint(localPoint);
+                Vector3 dir = (worldPoint - origin).normalized;
+                float maxDist = (worldPoint - origin).magnitude;
 
-                float maxDist = (transform.rotation * (localPoint - _centerOffset)).magnitude;
+                Vector3 finalPoint = localPoint;
 
-                Vector3 finalPoint;
-                Vector3 origin = transform.position + transform.rotation * _centerOffset;
                 if (Physics.Raycast(origin, dir, out RaycastHit hit, maxDist, _obstacleMask))
                 {
-                    Vector3 localHit = Quaternion.Inverse(transform.rotation) * (hit.point - transform.position);
-                    finalPoint = localHit;
-                }
-                else
-                {
-                    finalPoint = localPoint;
+                    finalPoint = inverseRotation * (hit.point - transform.position);
                 }
 
                 _vertices.Add(finalPoint);
                 _normals.Add(Vector3.up);
                 _uv.Add(new Vector2(t, 1f));
             }
-            
+
             for (int i = 1; i <= _segments; i++)
             {
                 _triangles.Add(0);
@@ -98,6 +98,9 @@ namespace Code.VisionCone
         private void OnDrawGizmosSelected()
         {
 #if UNITY_EDITOR
+            if (!enabled || _segments < 2)
+                return;
+
             Vector3 origin = transform.position + transform.rotation * _centerOffset;
 
             for (int i = 0; i <= _segments; i++)
@@ -105,12 +108,15 @@ namespace Code.VisionCone
                 float t = i / (float)_segments;
                 float localX = Mathf.Lerp(-_width / 2f, _width / 2f, t);
                 
-                float factor = 1f - Mathf.Abs(t - _falloffCenterBias) * _falloffPower;
-                float localZ = Mathf.Lerp(0f, _height, factor);
+                float centerOffset = Mathf.Abs(t - 0.5f) * _length;
+                centerOffset = Mathf.Clamp01(centerOffset);
+                float curve = Mathf.Sin((1f - centerOffset) * Mathf.PI * 0.5f);
+                float localZ = _preLength + _height * curve;
 
                 Vector3 localPoint = new Vector3(localX, 0f, localZ);
-                Vector3 dir = transform.rotation * (localPoint - _centerOffset).normalized;
-                float maxDist = (transform.rotation * (localPoint - _centerOffset)).magnitude;
+                Vector3 worldPoint = transform.TransformPoint(localPoint);
+                Vector3 dir = (worldPoint - origin).normalized;
+                float maxDist = (worldPoint - origin).magnitude;
 
                 if (Physics.Raycast(origin, dir, out RaycastHit hit, maxDist, _obstacleMask))
                 {
@@ -129,6 +135,5 @@ namespace Code.VisionCone
             Gizmos.DrawSphere(origin, 0.05f);
 #endif
         }
-
     }
 }
