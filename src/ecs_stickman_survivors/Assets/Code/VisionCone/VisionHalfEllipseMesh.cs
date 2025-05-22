@@ -1,22 +1,25 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Code.VisionCone
 {
-    public class VisionOffsetTriangleMesh : BaseVisionMesh
+    public class VisionHalfEllipseMesh : BaseVisionMesh
     {
         [Header("Square Settings")]
         [SerializeField] private float _width = 4f;
         [SerializeField] private float _height = 4f;
         [SerializeField] private int _segments = 64;
         [Header("Center Offset (local)")]
-        [SerializeField] private Vector3 _centerOffset = new(0f, 0f, -2f);
-
+        [SerializeField] private Vector3 _centerOffset = new Vector3(0f, 0f, -2f);
+        [SerializeField] private float _falloffPower = 0.25f;
+        [SerializeField] private float _falloffCenterBias = 0.5f;
+        
         private float _lastWidth;
         private float _lastHeight;
         private int _lastSegments;
         private Vector3 _lastOffset;
 
-        protected override string MeshName => "VisionOffsetTriangleMesh";
+        protected override string MeshName => "VisionHalfEllipseMesh";
 
         protected override void GenerateMesh()
         {
@@ -24,9 +27,6 @@ namespace Code.VisionCone
             _triangles.Clear();
             _normals.Clear();
             _uv.Clear();
-
-            Vector3 origin = transform.position + transform.rotation * _centerOffset;
-            Quaternion inverseRotation = Quaternion.Inverse(transform.rotation);
 
             _vertices.Add(_centerOffset);
             _normals.Add(Vector3.up);
@@ -36,23 +36,30 @@ namespace Code.VisionCone
             {
                 float t = i / (float)_segments;
                 float localX = Mathf.Lerp(-_width / 2f, _width / 2f, t);
-                Vector3 localPoint = new Vector3(localX, 0f, _height);
+
+                float factor = 1f - Mathf.Abs(t - _falloffCenterBias) * _falloffPower;
+                float localZ = Mathf.Lerp(0f, _height, factor);
+
+                Vector3 localPoint = new Vector3(localX, 0f, localZ);
                 Vector3 dir = transform.rotation * (localPoint - _centerOffset).normalized;
 
                 float maxDist = (transform.rotation * (localPoint - _centerOffset)).magnitude;
 
+                Vector3 finalPoint;
+                Vector3 origin = transform.position + transform.rotation * _centerOffset;
                 if (Physics.Raycast(origin, dir, out RaycastHit hit, maxDist, _obstacleMask))
                 {
-                    Vector3 localHit = inverseRotation * (hit.point - transform.position);
-                    _vertices.Add(localHit);
+                    Vector3 localHit = Quaternion.Inverse(transform.rotation) * (hit.point - transform.position);
+                    finalPoint = localHit;
                 }
                 else
                 {
-                    _vertices.Add(localPoint);
+                    finalPoint = localPoint;
                 }
 
+                _vertices.Add(finalPoint);
                 _normals.Add(Vector3.up);
-                _uv.Add(new Vector2(t, 1));
+                _uv.Add(new Vector2(t, 1f));
             }
             
             for (int i = 1; i <= _segments; i++)
@@ -70,12 +77,15 @@ namespace Code.VisionCone
             mesh.SetUVs(0, _uv);
         }
         
-        protected override bool ParamsChanged() =>
-            _lastWidth != _width ||
-            _lastHeight != _height ||
-            _lastSegments != _segments ||
-            _lastOffset != _centerOffset ||
-            base.ParamsChanged();
+        protected override bool ParamsChanged()
+        {
+            return
+                _lastWidth != _width ||
+                _lastHeight != _height ||
+                _lastSegments != _segments ||
+                _lastOffset != _centerOffset ||
+                base.ParamsChanged();
+        }
 
         protected override void CacheParams()
         {
@@ -95,7 +105,11 @@ namespace Code.VisionCone
             {
                 float t = i / (float)_segments;
                 float localX = Mathf.Lerp(-_width / 2f, _width / 2f, t);
-                Vector3 localPoint = new Vector3(localX, 0f, _height);
+                
+                float factor = 1f - Mathf.Abs(t - _falloffCenterBias) * _falloffPower;
+                float localZ = Mathf.Lerp(0f, _height, factor);
+
+                Vector3 localPoint = new Vector3(localX, 0f, localZ);
                 Vector3 dir = transform.rotation * (localPoint - _centerOffset).normalized;
                 float maxDist = (transform.rotation * (localPoint - _centerOffset)).magnitude;
 
@@ -111,7 +125,11 @@ namespace Code.VisionCone
                     Gizmos.DrawLine(origin, origin + dir * maxDist);
                 }
             }
+
+            Gizmos.color = Color.white;
+            Gizmos.DrawSphere(origin, 0.05f);
 #endif
         }
+
     }
 }
