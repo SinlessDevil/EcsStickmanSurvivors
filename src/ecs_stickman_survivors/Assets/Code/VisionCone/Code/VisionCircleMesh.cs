@@ -62,8 +62,8 @@ namespace Code.VisionCone
             _triangles.Add(0);
             _triangles.Add(1);
             _triangles.Add(_vertices.Count - 1);
-
-            Mesh mesh = _meshFilter.sharedMesh;
+            
+            Mesh mesh = GetOrCreateMesh();
             mesh.Clear();
             mesh.SetVertices(_vertices);
             mesh.SetTriangles(_triangles, 0);
@@ -71,6 +71,23 @@ namespace Code.VisionCone
             mesh.SetUVs(0, _uv);
         }
 
+        private Mesh GetOrCreateMesh()
+        {
+#if UNITY_EDITOR
+            if (_meshFilter.sharedMesh == null || _meshFilter.sharedMesh.name != MeshName)
+            {
+                _meshFilter.sharedMesh = new Mesh { name = MeshName };
+            }
+            return _meshFilter.sharedMesh;
+#else
+    if (_meshFilter.mesh == null || _meshFilter.mesh.name != MeshName)
+    {
+        _meshFilter.mesh = new Mesh { name = MeshName };
+    }
+    return _meshFilter.mesh;
+#endif
+        }
+        
         protected override bool ParamsChanged() =>
             !Mathf.Approximately(_lastAngle, _visionAngle) ||
             !Mathf.Approximately(_lastRange, _visionRange) ||
