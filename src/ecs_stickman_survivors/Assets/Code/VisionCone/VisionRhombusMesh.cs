@@ -29,19 +29,16 @@ namespace Code.VisionCone
 
             _vertices.Add(Vector3.zero);
             _normals.Add(Vector3.up);
-            _uv.Add(new Vector2(0.5f, 0.5f));
+            _uv.Add(Vector2.zero);
 
             float halfWidth = _width / 2f;
             float halfHeight = _height / 2f;
-            Quaternion tilt = Quaternion.Euler(0f, _tiltAngle, 0f);
-
+            
             for (int i = 0; i < _segments; i++)
             {
                 float t = i / (float)_segments;
-
                 Vector3 edgeLocal = GetPointOnRhombusEdge(t, halfWidth, halfHeight);
-                Vector3 rotated = tilt * edgeLocal;
-                Vector3 edgeWorld = transform.TransformPoint(rotated);
+                Vector3 edgeWorld = transform.TransformPoint(edgeLocal);
 
                 Vector3 dir = (edgeWorld - origin).normalized;
                 float dist = (edgeWorld - origin).magnitude;
@@ -75,24 +72,40 @@ namespace Code.VisionCone
             mesh.SetNormals(_normals);
             mesh.SetUVs(0, _uv);
         }
-
+        
         private Vector3 GetPointOnRhombusEdge(float t, float halfWidth, float halfHeight)
         {
             float total = t * 4f;
+
             return total switch
             {
-                < 1f => Vector3.Lerp(new Vector3(-halfWidth, 0, 0), new Vector3(0, 0, halfHeight), total),
-                < 2f => Vector3.Lerp(new Vector3(0, 0, halfHeight), new Vector3(halfWidth, 0, 0), total - 1f),
-                < 3f => Vector3.Lerp(new Vector3(halfWidth, 0, 0), new Vector3(0, 0, -halfHeight), total - 2f),
-                _    => Vector3.Lerp(new Vector3(0, 0, -halfHeight), new Vector3(-halfWidth, 0, 0), total - 3f),
+                < 1f => Vector3.Lerp(
+                    new Vector3(-halfWidth, 0, 0),
+                    new Vector3(0, 0, halfHeight),
+                    total
+                ),
+                < 2f => Vector3.Lerp(
+                    new Vector3(0, 0, halfHeight),
+                    new Vector3(halfWidth, 0, 0),
+                    total - 1f
+                ),
+                < 3f => Vector3.Lerp(
+                    new Vector3(halfWidth, 0, 0),
+                    new Vector3(0, 0, -halfHeight),
+                    total - 2f
+                ),
+                _ => Vector3.Lerp(
+                    new Vector3(0, 0, -halfHeight),
+                    new Vector3(-halfWidth, 0, 0),
+                    total - 3f
+                )
             };
         }
-        
+
+#if UNITY_EDITOR
         private void OnDrawGizmosSelected()
         {
-#if UNITY_EDITOR
-            if (!enabled || _segments < 4) 
-                return;
+            if (!enabled || _segments < 4) return;
 
             Vector3 origin = transform.position;
             Quaternion rotation = transform.rotation;
@@ -101,53 +114,39 @@ namespace Code.VisionCone
             float halfWidth = _width / 2f;
             float halfHeight = _height / 2f;
 
-            Vector3[] corners =
+            for (int i = 0; i < _segments; i++)
             {
-                new Vector3(-halfWidth, 0f, 0f),
-                new Vector3(0f, 0f, halfHeight),
-                new Vector3(halfWidth, 0f, 0f),
-                new Vector3(0f, 0f, -halfHeight)
-            };
+                float t = i / (float)_segments;
+                Vector3 edgeLocal = GetPointOnRhombusEdge(t, halfWidth, halfHeight);
+                Vector3 rotated = tilt * edgeLocal;
+                Vector3 edgeWorld = transform.TransformPoint(rotated);
+                Vector3 dir = edgeWorld - origin;
+                float dist = dir.magnitude;
+                dir.Normalize();
 
-            int sideSegments = _segments / 4;
-
-            for (int i = 0; i < 4; i++)
-            {
-                Vector3 from = corners[i];
-                Vector3 to = corners[(i + 1) % 4];
-
-                for (int j = 0; j <= sideSegments; j++)
+                if (Physics.Raycast(origin, dir, out RaycastHit hit, dist, _obstacleMask))
                 {
-                    float t = j / (float)sideSegments;
-                    Vector3 localPoint = Vector3.Lerp(from, to, t);
-                    Vector3 worldPoint = origin + rotation * (tilt * localPoint);
-
-                    Vector3 dir = (worldPoint - origin).normalized;
-                    float maxDistance = (worldPoint - origin).magnitude;
-
-                    if (Physics.Raycast(origin, dir, out RaycastHit hit, maxDistance, _obstacleMask))
-                    {
-                        Gizmos.color = Color.red;
-                        Gizmos.DrawLine(origin, hit.point);
-                    }
-                    else
-                    {
-                        Gizmos.color = Color.green;
-                        Gizmos.DrawLine(origin, worldPoint);
-                    }
+                    Gizmos.color = Color.red;
+                    Gizmos.DrawLine(origin, hit.point);
+                    Gizmos.DrawSphere(hit.point, 0.025f);
+                }
+                else
+                {
+                    Gizmos.color = Color.green;
+                    Gizmos.DrawLine(origin, edgeWorld);
                 }
             }
 
             Gizmos.color = Color.white;
             Gizmos.DrawSphere(origin, 0.05f);
-#endif
         }
+#endif
 
         protected override bool ParamsChanged() =>
-            _lastWidth != _width || 
-            _lastHeight != _height || 
-            _lastTilt != _tiltAngle || 
-            _lastSegments != _segments || 
+            _lastWidth != _width ||
+            _lastHeight != _height ||
+            _lastTilt != _tiltAngle ||
+            _lastSegments != _segments ||
             base.ParamsChanged();
 
         protected override void CacheParams()
