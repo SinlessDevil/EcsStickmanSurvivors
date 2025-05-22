@@ -99,7 +99,8 @@ namespace Code.VisionCone
 #if UNITY_EDITOR
         private void OnDrawGizmosSelected()
         {
-            if (!enabled || _segments < 4) return;
+            if (!enabled || _segments < 4) 
+                return;
 
             Vector3 origin = transform.position;
             Quaternion rotation = transform.rotation;
