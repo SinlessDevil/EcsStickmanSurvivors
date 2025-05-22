@@ -95,5 +95,45 @@ namespace Code.VisionCone
             _lastSegments = _segments;
             base.CacheParams();
         }
+        
+#if UNITY_EDITOR
+        private void OnDrawGizmosSelected()
+        {
+            if (!enabled || _segments < 4) return;
+
+            Vector3 origin = transform.position;
+            Quaternion rotation = transform.rotation;
+
+            float angleRad = _angleDegrees * Mathf.Deg2Rad;
+            float halfDiagH = Mathf.Cos(angleRad / 2f) * _sideLength;
+            float halfDiagV = Mathf.Sin(angleRad / 2f) * _sideLength;
+
+            for (int i = 0; i <= _segments; i++)
+            {
+                float t = i / (float)_segments;
+                Vector3 edgeLocal = GetPointOnRhombusEdge(t, halfDiagH, halfDiagV);
+                Vector3 edgeWorld = transform.TransformPoint(edgeLocal);
+                Vector3 dir = edgeWorld - origin;
+                float dist = dir.magnitude;
+                dir.Normalize();
+
+                if (Physics.Raycast(origin, dir, out RaycastHit hit, dist, _obstacleMask))
+                {
+                    Gizmos.color = Color.red;
+                    Gizmos.DrawLine(origin, hit.point);
+                    Gizmos.DrawSphere(hit.point, 0.025f);
+                }
+                else
+                {
+                    Gizmos.color = Color.green;
+                    Gizmos.DrawLine(origin, edgeWorld);
+                }
+            }
+
+            Gizmos.color = Color.white;
+            Gizmos.DrawSphere(origin, 0.05f);
+        }
+#endif
+
     }
 }

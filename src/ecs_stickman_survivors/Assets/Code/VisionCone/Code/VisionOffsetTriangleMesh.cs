@@ -70,7 +70,7 @@ namespace Code.VisionCone
             mesh.SetUVs(0, _uv);
         }
         
-        protected override bool ParamsChanged() =>
+        protected override bool ParamsChanged()=>
             _lastWidth != _width ||
             _lastHeight != _height ||
             _lastSegments != _segments ||
