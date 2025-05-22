@@ -63,29 +63,19 @@ namespace Code.VisionCone
             _triangles.Add(1);
             _triangles.Add(_vertices.Count - 1);
             
-            Mesh mesh = GetOrCreateMesh();
+            Mesh mesh = _meshFilter.sharedMesh;
+            if (mesh == null || mesh.name != MeshName)
+            {
+                mesh = new Mesh { name = MeshName };
+                mesh.MarkDynamic();
+                _meshFilter.sharedMesh = mesh;
+            }
+            
             mesh.Clear();
             mesh.SetVertices(_vertices);
             mesh.SetTriangles(_triangles, 0);
             mesh.SetNormals(_normals);
             mesh.SetUVs(0, _uv);
-        }
-
-        private Mesh GetOrCreateMesh()
-        {
-#if UNITY_EDITOR
-            if (_meshFilter.sharedMesh == null || _meshFilter.sharedMesh.name != MeshName)
-            {
-                _meshFilter.sharedMesh = new Mesh { name = MeshName };
-            }
-            return _meshFilter.sharedMesh;
-#else
-    if (_meshFilter.mesh == null || _meshFilter.mesh.name != MeshName)
-    {
-        _meshFilter.mesh = new Mesh { name = MeshName };
-    }
-    return _meshFilter.mesh;
-#endif
         }
         
         protected override bool ParamsChanged() =>

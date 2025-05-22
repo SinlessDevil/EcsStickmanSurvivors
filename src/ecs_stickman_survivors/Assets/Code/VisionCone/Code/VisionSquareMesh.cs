@@ -26,7 +26,7 @@ namespace Code.VisionCone
             Quaternion rotation = transform.rotation;
             Quaternion inverse = Quaternion.Inverse(rotation);
 
-            _vertices.Add(Vector3.zero); // Центр
+            _vertices.Add(Vector3.zero);
             _normals.Add(Vector3.up);
             _uv.Add(Vector2.zero);
 
@@ -50,7 +50,6 @@ namespace Code.VisionCone
                 _uv.Add(new Vector2(t, 1f));
             }
 
-            // 🔁 Инвертируем порядок треугольников
             for (int i = 1; i < _vertices.Count - 1; i++)
             {
                 _triangles.Add(0);
@@ -58,7 +57,6 @@ namespace Code.VisionCone
                 _triangles.Add(i);
             }
 
-            // Замыкающий треугольник
             _triangles.Add(0);
             _triangles.Add(1);
             _triangles.Add(_vertices.Count - 1);
@@ -92,7 +90,6 @@ namespace Code.VisionCone
         private void OnDrawGizmosSelected()
         {
             Vector3 origin = transform.position;
-            Quaternion rotation = transform.rotation;
 
             for (int i = 0; i < _segments; i++)
             {
@@ -118,14 +115,11 @@ namespace Code.VisionCone
         }
 #endif
 
-        protected override bool ParamsChanged()
-        {
-            return
-                _lastWidth != _width ||
-                _lastHeight != _height ||
-                _lastSegments != _segments ||
-                base.ParamsChanged();
-        }
+        protected override bool ParamsChanged() =>
+            _lastWidth != _width ||
+            _lastHeight != _height ||
+            _lastSegments != _segments ||
+            base.ParamsChanged();
 
         protected override void CacheParams()
         {

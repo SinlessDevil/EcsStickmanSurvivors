@@ -97,7 +97,7 @@ namespace Code.VisionCone
                 GenerateMesh();
             }
         }
-
+        
         protected virtual bool ParamsChanged() =>
             _lastPosition != transform.position ||
             _lastRotation != transform.rotation;
